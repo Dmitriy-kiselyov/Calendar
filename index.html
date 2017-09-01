@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Календарь</title>
+    <link rel="stylesheet" type="text/css" href="calendar.css">
+</head>
+
+<body>
+</body>
+
+<script src="Calendar.js"></script>
+<script src="CalendarEvent.js"></script>
+<script>
+    var calendar = new Calendar();
+    document.body.appendChild(calendar.getElement());
+    calendar.notifyEvents();
+</script>
+
+</html>

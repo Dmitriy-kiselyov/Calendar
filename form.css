@@ -1,0 +1,65 @@
+.event-form form {
+    width: 330px;
+}
+
+.event-form td {
+    padding-bottom: 5px;
+}
+
+.event-form input {
+    font-size: 10pt;
+    font-family: monospace;
+}
+
+.event-form input[type="text"] {
+    width: 180px;
+    padding: 2px;
+}
+
+.event-form textarea {
+    padding: 2px;
+    font-family: monospace;
+    font-size: 10pt;
+    max-height: 150px;
+    min-height: 100px;
+    height: 100px;
+    max-width: 180px;
+    min-width: 180px;
+}
+
+.event-form select {
+    font-size: 10pt;
+    font-family: monospace;
+    padding: 2px;
+}
+
+.label {
+    padding-right: 10px;
+    float: right;
+    font-size: 12pt;
+}
+
+.label.required:after {
+    content: "*";
+    font-size: 12pt;
+    font-family: monospace;
+    font-weight: bold;
+    color: red;
+}
+
+.event-form .title {
+    font-size: 25pt;
+}
+
+.event-form .buttons {
+    margin-top: 30px;
+    float: right;
+}
+
+.event-form .error {
+    border-color: red;
+}
+
+.event-form .error-message {
+    color: red;
+}

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать событие</title>
+    <link rel="stylesheet" type="text/css" href="form.css">
+</head>
+
+<body>
+
+<div class="event-form" align="center">
+    <form>
+
+        <p class="title">Редактировать событие</p>
+        <table>
+            <tbody>
+            <tr>
+                <td class="label required">Наименование</td>
+                <td>
+                    <input type="text" name="title" maxlength="20">
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Описание</td>
+                <td>
+                    <textarea name="description" maxlength="150"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td class="label required">Дата</td>
+                <td>
+                    <!--<input type="date">-->
+                    <input name="datepicker" type="text">
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Время</td>
+                <td>
+                    <!--<input type="time">-->
+                    <input name="timepicker" type="text">
+                </td>
+            </tr>
+            <tr>
+                <td class="label required">Напомнить</td>
+                <td>
+                    <select name="remind">
+                        <option value="no" selected>нет</option>
+                        <option value="1h">за 1 час</option>
+                        <option value="5m">за 5 минут</option>
+                        <option value="in_time">вовремя</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <span class="error-message" hidden>Заполните пустые поля!</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="buttons">
+            <input type="submit" value="ОК">
+            <input type="button" name="cancel" value="Отмена">
+            <input type="button" name="delete" value="Удалить">
+        </div>
+
+    </form>
+</div>
+
+</body>
+
+<!-- this should go after your </body> -->
+<link rel="stylesheet" type="text/css" href="datetimepicker/jquery.datetimepicker.css">
+<script src="datetimepicker/jquery.js"></script>
+<script src="datetimepicker/build/jquery.datetimepicker.full.min.js"></script>
+<script src="CalendarEvent.js"></script>
+
+<script>
+    var onOKListener; //function(event)
+    var onCancelListener; //function()
+    var onDeleteListener; //function()
+
+    var form = document.forms[0];
+
+    $(form.datepicker).datetimepicker({
+        timepicker: false,
+        format: "d.m.Y",
+        dayOfWeekStart: 1
+    });
+
+    $(form.timepicker).datetimepicker({
+        datepicker: false,
+        format: "H:i",
+        step: 30
+    });
+
+    form.onsubmit = function () {
+        //trim all fields
+        var fields = form.querySelectorAll("input, textarea");
+        for (var i = 0; i < fields.length; i++)
+            fields[i].value = fields[i].value.trim();
+
+        //check for empty fields
+        fields = [form.title, form.datepicker];
+        var empty = false;
+        for (i = 0; i < fields.length; i++) {
+            if (!fields[i].value) {
+                empty = true;
+                fields[i].classList.add("error");
+            } else {
+                fields[i].classList.remove("error");
+            }
+        }
+        if (empty) {
+            form.getElementsByClassName("error-message")[0].hidden = false;
+            return false;
+        } else {
+            form.getElementsByClassName("error-message")[0].hidden = true;
+        }
+
+        //get information
+        var title = form.title.value;
+        var descr = form.description.value;
+        var date = new Date($(form.datepicker).datetimepicker("getValue"));
+        var time = $(form.timepicker).datetimepicker("getValue");
+        if (time != null) {
+            date.setHours(time.getHours());
+            date.setMinutes(time.getMinutes());
+        }
+        var remindOption = form.remind.options[form.remind.selectedIndex].value;
+
+        //post event object
+        var calendarEvent = new CalendarEvent(title, descr, date, time != null, remindOption, eventId);
+        if (onOKListener)
+            onOKListener(calendarEvent);
+
+        //close
+        window.close();
+    };
+
+    form.cancel.onclick = function () {
+        if (onCancelListener)
+            onCancelListener();
+        window.close();
+    };
+
+    form.delete.onclick = function () {
+        if (onDeleteListener)
+            onDeleteListener();
+        window.close();
+    };
+
+    //fulfill form
+    var args = window.location.search.substring(1);
+    var eventId = args.split("=")[1];
+    var event = CalendarEvent.fromId(eventId);
+
+    form.title.value = event.title;
+    if (event.description)
+        form.description.value = event.description;
+    $(form.datepicker).datetimepicker({value: event.date});
+    if (event.hasTime)
+        $(form.timepicker).datetimepicker({value: event.date});
+    for (var i = 0; i < form.remind.options.length; i++) {
+        if (form.remind.options[i].value == event.remindOption) {
+            form.remind.selectedIndex = i;
+            break;
+        }
+    }
+
+
+</script>
+
+</html>

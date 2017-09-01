@@ -1,0 +1,115 @@
+.calendar__month-table {
+    border-collapse: collapse;
+}
+
+.calendar__title {
+    font-size: 24pt;
+}
+
+.calendar__day {
+    border: 1px solid gray;
+    width: 110px;
+    min-width: 110px;
+    height: 110px;
+    vertical-align: top;
+}
+
+.calendar__day-today {
+    background-color: lightcyan;
+}
+
+.calendar__day-info {
+    table-layout: fixed;
+    width: 100%;
+    border: none;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+.calendar__weeks {
+    font-weight: normal;
+}
+
+.calendar__day-date {
+    text-align: right;
+    height: auto;
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+.calendar__day-date-adjacent {
+    color: lightgrey;
+}
+
+.calendar__day-date-weekend {
+    color: red;
+}
+
+.calendar__day-event {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    background-color: aquamarine;
+    border-radius: 4px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.unselectable {
+    -moz-user-select: none;
+    -o-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.calendar button {
+    min-width: 30px;
+    height: 30px;
+    text-align: center;
+    font-size: 12pt;
+    font-weight: normal;
+    margin: 2px;
+    cursor: pointer;
+    border: 1px solid gray;
+    transition: all .1s;
+}
+
+.calendar__buttons {
+    width: 790px;
+    margin-bottom: 20px;
+}
+
+.calendar button:active:hover {
+    background-color: lightblue;
+}
+
+.calendar button:hover {
+    background-color: lightcyan;
+}
+
+.calendar__tooltip {
+    position: absolute;
+    width: 150px;
+    z-index: 1000;
+    padding-left: 5px;
+    padding-right: 5px;
+    border: 2px solid white;
+    border-radius: 10px;
+    background: aquamarine;
+    font-size: small;
+    white-space: pre-line;
+    word-wrap: break-word;
+
+    transition: opacity 0.5s;
+}
+
+.calendar__tooltip h3 {
+    margin: 5px;
+}
+
+.calendar__tooltip p {
+    margin: 5px;
+}
