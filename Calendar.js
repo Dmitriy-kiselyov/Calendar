@@ -51,16 +51,13 @@ function Calendar(options) {
      * @param {String} tag Тэг элемента.
      * @param {String} [className] Имена классов, разделенные пробелом.
      * @param {String} [text] Внутренний текст элемента.
-     * @param {bool} [textAsTextContent] Если true, внутренний текст элемента будет отображаться без обработки html-тэгов.
      * @returns {Element}
      */
-    function element(tag, className, text, textAsTextContent) {
+    function element(tag, className, text) {
         var el = document.createElement(tag);
         if (className)
             el.className = className;
-        if (text && !textAsTextContent)
-            el.innerHTML = text;
-        if (text && textAsTextContent)
+        if (text)
             el.textContent = text;
         return el;
     }
@@ -76,7 +73,9 @@ function Calendar(options) {
         }
 
         //Загрузить оболочку календаря
-        rootElement = loadTemplate();
+        var wrapper = document.createElement("div");
+        wrapper.innerHTML = loadTemplate("calendar_template.html");
+        rootElement = wrapper.firstElementChild;
 
         //Заголовок календаря
         updateMonthHeader();
@@ -85,7 +84,7 @@ function Calendar(options) {
         rootElement.querySelector(".calendar__nav-today").onclick = currentMonth;
 
         //Сетка календаря
-        var grid = makeMonthTable();
+        var grid = makeMonthGrid();
         rootElement.appendChild(grid);
 
         rootElement.onclick = function (event) {
@@ -139,27 +138,26 @@ function Calendar(options) {
     }
 
     /**
-     * Возвращает шаблон календаря
-     * @returns {Element}
+     * Возвращает шаблон
+     * @param url путь к шаблону
+     * @returns {string} html представление данных
      */
-    function loadTemplate() {
+    function loadTemplate(url) {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "calendar_template.html", false);
+        xhr.open("GET", url, false);
         xhr.send();
 
         if (xhr.status == 200) {
-            var wrapper = document.createElement("div");
-            wrapper.innerHTML = xhr.responseText;
-            return wrapper.firstElementChild;
+            return xhr.responseText;
         }
     }
 
     /**
-     * Возвращает таблицу с днями и событиями для текущего месяца.
+     * Возвращает сетку с днями и событиями для текущего месяца.
      * @returns {Element}
      */
-    function makeMonthTable() {
-        var table = element("table", "calendar__grid");
+    function makeMonthGrid() {
+        var grid = element("table", "calendar__grid");
 
         //make thead
         var tr = element("tr");
@@ -167,7 +165,7 @@ function Calendar(options) {
             var th = element("th", "calendar__week", WEEK_NAMES[i]);
             tr.appendChild(th);
         }
-        table.appendChild(element("thead")).appendChild(tr);
+        grid.appendChild(element("thead")).appendChild(tr);
 
         //make tbody
         var tbody = element("tbody");
@@ -180,24 +178,29 @@ function Calendar(options) {
             }
             tbody.appendChild(tr);
         }
-        table.appendChild(tbody);
+        grid.appendChild(tbody);
 
-        //fill table with information
-        fillTableWithDays(table);
-        fillTableWithEvents(table);
+        //Заполняет сетку информацией
+        fillGridWithDays(grid);
+        fillGridWithEvents(grid);
 
-        return table;
+        return grid;
     }
 
     /**
-     * Заполняет данную ей таблицу днями текущего месяца (если есть необходимость, отмечает предыдущий и следующий месяцы).
+     * Заполняет данную ей сетку днями текущего месяца (отмечает предыдущий и следующий месяцы).
      * @param {HTMLTableElement} table
      */
-    function fillTableWithDays(table) {
-        var eventsTable = element("table", "calendar__day_info");
-        eventsTable.appendChild(element("thead"))
-                   .appendChild(element("tr"))
-                   .appendChild(element("th", "calendar__day_date"));
+    function fillGridWithDays(table) {
+        var template = _.template(loadTemplate("calendar_day_template.html"));
+
+        function defaultData(date) {
+            return {
+                date: date,
+                weekend: false,
+                adjacent: false
+            }
+        }
 
         var date = new Date(year, month, 1);
         var today = new Date();
@@ -211,20 +214,19 @@ function Calendar(options) {
             return d1.getDate() == d2.getDate() && d1.getMonth() == d2.getMonth() && d1.getFullYear() == d2.getFullYear();
         };
 
-        //this month days
+        //Дни текущего месяца
         var i = 1, j = getDay();
         while (month == date.getMonth()) {
-            var eventsTableClone = eventsTable.cloneNode(true);
-            var th = eventsTableClone.getElementsByTagName("th")[0];
-            th.textContent = date.getDate();
+            var templateData = defaultData(date);
             if (j >= 5)
-                th.classList.add("calendar__day_date-weekend");
-            eventsTableClone.dataset.date = date.toDateString();
+                templateData.weekend = true;
+            table.rows[i].cells[j].innerHTML = template(templateData);
 
-            table.rows[i].cells[j].appendChild(eventsTableClone);
+            //Если попали в текущий день
             if (equalDate(date, today))
                 table.rows[i].cells[j].classList.add("calendar__day-today");
 
+            //Следующий день
             date.setDate(date.getDate() + 1);
             j++;
             if (j == 7) {
@@ -233,32 +235,31 @@ function Calendar(options) {
             }
         }
 
-        //adjacent month days
-        th = eventsTable.getElementsByTagName("th")[0];
-        th.classList.add("calendar__day_date-adjacent");
-
-        //next month days
+        //Дни следующего месяца
         for (; i < table.rows.length; i++) {
             var row = table.rows[i];
-            for (; j < row.cells.length; j++) {
-                th = eventsTable.getElementsByTagName("th")[0];
-                th.textContent = date.getDate();
-                row.cells[j].appendChild(eventsTable.cloneNode(true));
 
+            for (; j < row.cells.length; j++) {
+                templateData = defaultData(date);
+                templateData.adjacent = true;
+                row.cells[j].innerHTML = template(templateData);
+
+                //Следующий день
                 date.setDate(date.getDate() + 1);
             }
             j = 0;
         }
 
-        //prev month days
+        //Дни предыдущего месяца
         date = new Date(year, month, 1);
         date.setDate(0);
 
         for (j = (getDay() == 6 ? -1 : getDay()); j >= 0; j--) {
-            th = eventsTable.getElementsByTagName("th")[0];
-            th.textContent = date.getDate();
-            table.rows[1].cells[j].appendChild(eventsTable.cloneNode(true));
+            templateData = defaultData(date);
+            templateData.adjacent = true;
+            table.rows[1].cells[j].innerHTML = template(templateData);
 
+            //Предыдущий день
             date.setDate(date.getDate() - 1);
         }
     }
@@ -267,7 +268,7 @@ function Calendar(options) {
      * Заполняет данную ей таблицу событиями текущего месяца.
      * @param {HTMLTableElement} table
      */
-    function fillTableWithEvents(table) {
+    function fillGridWithEvents(table) {
         var monthEvents = CalendarEvent.getMonthEvents(month);
         CalendarEvent.sort(monthEvents);
 
@@ -324,7 +325,7 @@ function Calendar(options) {
         updateMonthHeader();
 
         var table = rootElement.querySelector(".calendar__grid");
-        table.parentNode.replaceChild(makeMonthTable(), table);
+        table.parentNode.replaceChild(makeMonthGrid(), table);
     }
 
     /**

@@ -1,0 +1,19 @@
+<table class="calendar__day_info" data-date="<%= date.toDateString() %>">
+    <thead>
+    <tr>
+        <th class="calendar__day_date
+            <% if (weekend) {%>
+                calendar__day_date-weekend
+            <% } %>
+            <% if (adjacent) {%>
+                calendar__day_date-adjacent
+            <% } %>"
+        >
+            <%= date.getDate() %>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <!--События-->
+    </tbody>
+</table>
