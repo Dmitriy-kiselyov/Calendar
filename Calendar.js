@@ -88,6 +88,11 @@ function Calendar(options) {
         rootElement.appendChild(grid);
 
         rootElement.onclick = function (event) {
+            if (event.target.classList.contains("calendar__day_plus")) { //Новое событие
+                var day = event.target.closest(".calendar__day_info").dataset.date;
+                addEvent(day);
+            }
+
             if (event.target.dataset.eventId) { //Редактировать событие
                 editEvent(event.target.dataset.eventId);
             }
@@ -194,14 +199,6 @@ function Calendar(options) {
     function fillGridWithDays(table) {
         var template = _.template(loadTemplate("calendar_day_template.html"));
 
-        function defaultData(date) {
-            return {
-                date: date,
-                weekend: false,
-                adjacent: false
-            }
-        }
-
         var date = new Date(year, month, 1);
         var today = new Date();
         var getDay = function () {
@@ -217,7 +214,7 @@ function Calendar(options) {
         //Дни текущего месяца
         var i = 1, j = getDay();
         while (month == date.getMonth()) {
-            var templateData = defaultData(date);
+            var templateData = {date: date};
             if (j >= 5)
                 templateData.weekend = true;
             table.rows[i].cells[j].innerHTML = template(templateData);
@@ -240,8 +237,7 @@ function Calendar(options) {
             var row = table.rows[i];
 
             for (; j < row.cells.length; j++) {
-                templateData = defaultData(date);
-                templateData.adjacent = true;
+                templateData = {date: date, adjacent: true};
                 row.cells[j].innerHTML = template(templateData);
 
                 //Следующий день
@@ -255,8 +251,7 @@ function Calendar(options) {
         date.setDate(0);
 
         for (j = (getDay() == 6 ? -1 : getDay()); j >= 0; j--) {
-            templateData = defaultData(date);
-            templateData.adjacent = true;
+            templateData = {date: date, adjacent: true};
             table.rows[1].cells[j].innerHTML = template(templateData);
 
             //Предыдущий день
@@ -368,9 +363,11 @@ function Calendar(options) {
     /**
      * Открывает страницу для создания нового события.
      * Если была нажата кнопка OK, событие добавляется в {@link localStorage}, а сам календарь обновляется.
+     *
+     * @param {Date} day Для какого дня создается событие
      */
-    function addEvent() {
-        var eventWindow = window.open("new-event.html");
+    function addEvent(day) {
+        var eventWindow = window.open("new-event.html?date=" + day);
 
         eventWindow.onOKListener = function (event) {
             addNewEvent(event);

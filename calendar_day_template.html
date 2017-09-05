@@ -1,15 +1,19 @@
 <table class="calendar__day_info" data-date="<%= date.toDateString() %>">
     <thead>
     <tr>
-        <th class="calendar__day_date
-            <% if (weekend) {%>
-                calendar__day_date-weekend
+        <th>
+            <% if (typeof(adjacent) == 'undefined' || !adjacent) { %>
+            <span class="calendar__day_plus">+</span>
             <% } %>
-            <% if (adjacent) {%>
-                calendar__day_date-adjacent
-            <% } %>"
-        >
-            <%= date.getDate() %>
+            <span class="calendar__day_date
+                <% if (typeof(weekend) != 'undefined' && weekend) { %>
+                    calendar__day_date-weekend
+                <% } %>
+                <% if (typeof(adjacent) != 'undefined' && adjacent) { %>
+                    calendar__day_date-adjacent
+                <% } %>">
+                <%= date.getDate() %>
+            </span>
         </th>
     </tr>
     </thead>

@@ -84,10 +84,14 @@
 
     var form = document.forms[0];
 
+    var date = window.location.search.match(/\?date=(.+)/)[1];
+    date = new Date(decodeURI(date));
+
     $(form.datepicker).datetimepicker({
         timepicker: false,
         format: "d.m.Y",
-        dayOfWeekStart: 1
+        dayOfWeekStart: 1,
+        value: date
     });
 
     $(form.timepicker).datetimepicker({
