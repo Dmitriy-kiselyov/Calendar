@@ -59,12 +59,10 @@
 }
 
 .calendar__nav[disabled] {
-    background-color: gray;
-}
-
-.calendar__nav[disabled]:hover {
-    box-shadow: none !important;
-    cursor: default;
+    background-color: #999;
+    box-shadow: none;
+    pointer-events: none;
+    line-height: 20px;
 }
 
 /*calendar grid*/

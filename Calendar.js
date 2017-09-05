@@ -308,6 +308,13 @@ function Calendar(options) {
     function updateMonthHeader() {
         var header = rootElement.querySelector(".calendar__title");
         header.textContent = MONTH_NAMES[month] + " " + year;
+
+        var todayButton = rootElement.querySelector(".calendar__nav-today");
+        var today = new Date();
+        if (today.getFullYear() == year && today.getMonth() == month)
+            todayButton.setAttribute("disabled", true);
+        else
+            todayButton.removeAttribute("disabled");
     }
 
     /**
