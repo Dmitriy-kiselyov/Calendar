@@ -1,9 +1,47 @@
-.calendar__month-table {
-    border-collapse: collapse;
+.calendar {
+    display: inline-block;
+
+    /*no select*/
+    -moz-user-select: none;
+    -o-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/*head*/
+
+.calendar__head {
+    margin-bottom: 20px;
+    overflow: auto;
 }
 
 .calendar__title {
-    font-size: 24pt;
+    font-size: 30px;
+    text-align: center;
+}
+
+.calendar__nav {
+    min-width: 30px;
+    height: 30px;
+    font-size: 20px;
+    cursor: pointer;
+    border: 1px solid gray;
+}
+
+.calendar__nav:active:hover {
+    background-color: lightblue;
+}
+
+.calendar__nav:hover {
+    background-color: lightcyan;
+}
+
+/*calendar grid*/
+
+.calendar__grid {
+    border-collapse: collapse;
 }
 
 .calendar__day {
@@ -18,7 +56,7 @@
     background-color: lightcyan;
 }
 
-.calendar__day-info {
+.calendar__day_info {
     table-layout: fixed;
     width: 100%;
     border: none;
@@ -26,26 +64,27 @@
     border-spacing: 2px;
 }
 
-.calendar__weeks {
+.calendar__week {
     font-weight: normal;
 }
 
-.calendar__day-date {
+.calendar__day_date {
     text-align: right;
     height: auto;
     font-weight: bold;
     font-size: 12pt;
 }
 
-.calendar__day-date-adjacent {
+.calendar__day_date-adjacent {
     color: lightgrey;
 }
 
-.calendar__day-date-weekend {
+.calendar__day_date-weekend {
     color: red;
 }
 
-.calendar__day-event {
+.calendar__day_event {
+    text-align: left;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -56,41 +95,10 @@
     cursor: pointer;
 }
 
-.unselectable {
-    -moz-user-select: none;
-    -o-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.calendar button {
-    min-width: 30px;
-    height: 30px;
-    text-align: center;
-    font-size: 12pt;
-    font-weight: normal;
-    margin: 2px;
-    cursor: pointer;
-    border: 1px solid gray;
-    transition: all .1s;
-}
-
-.calendar__buttons {
-    width: 790px;
-    margin-bottom: 20px;
-}
-
-.calendar button:active:hover {
-    background-color: lightblue;
-}
-
-.calendar button:hover {
-    background-color: lightcyan;
-}
+/*tooltip*/
 
 .calendar__tooltip {
+    text-align: left;
     position: absolute;
     width: 150px;
     z-index: 1000;

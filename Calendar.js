@@ -25,7 +25,7 @@ function Calendar(options) {
         setDate(options.date);
 
     /**
-     * Устанавливает новый день, для которого строится месячный календарь.
+     * Устанавливает месяц, для которого строится календарь.
      * @param {Date} date Новый день.
      */
     function setDate(date) {
@@ -75,24 +75,26 @@ function Calendar(options) {
             year = date.getFullYear();
         }
 
-        var buttonDiv = makeMonthButtons();
-        var table = makeMonthTable();
+        //Загрузить оболочку календаря
+        rootElement = loadTemplate();
 
-        //create root element
-        rootElement = document.createElement("div");
-        rootElement.setAttribute("align", "center");
-        rootElement.classList.add("calendar");
-        rootElement.classList.add("unselectable");
-        rootElement.appendChild(buttonDiv);
-        rootElement.appendChild(table);
+        //Заголовок календаря
+        updateMonthHeader();
+        rootElement.querySelector(".calendar__nav-prev").onclick = prevMonth;
+        rootElement.querySelector(".calendar__nav-next").onclick = nextMonth;
+        rootElement.querySelector(".calendar__nav-today").onclick = currentMonth;
 
-        //add listeners
+        //Сетка календаря
+        var grid = makeMonthTable();
+        rootElement.appendChild(grid);
+
         rootElement.onclick = function (event) {
-            if (event.target.dataset.eventId) { //edit event
+            if (event.target.dataset.eventId) { //Редактировать событие
                 editEvent(event.target.dataset.eventId);
             }
         };
-        //tooltip listeners
+
+        //всплывающая подсказка
         rootElement.onmouseover = function (event) {
             if (event.target.dataset.eventId) {
                 var eventId = event.target.dataset.eventId;
@@ -111,7 +113,7 @@ function Calendar(options) {
 
                 //animation
                 tooltip.style.opacity = "0";
-                rootElement.querySelector(".calendar__month-table").appendChild(tooltip);
+                rootElement.querySelector(".calendar__grid").appendChild(tooltip);
                 setTimeout(function () {
                     tooltip.style.opacity = "1";
                 }, 0);
@@ -137,41 +139,19 @@ function Calendar(options) {
     }
 
     /**
-     * Возвращает div, внутри которого находятся кнопки управления для месячного календаря.
+     * Возвращает шаблон календаря
      * @returns {Element}
      */
-    function makeMonthButtons() {
-        var makeButton = function (text, onclick) {
-            var button = document.createElement("button");
-            button.innerHTML = text;
+    function loadTemplate() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "calendar_template.html", false);
+        xhr.send();
 
-            if (onclick)
-                button.onclick = onclick;
-
-            return button;
-        };
-
-        var buttonDiv = element("div", "calendar__buttons");
-
-        var leftDiv = element("div");
-        leftDiv.style.cssText = "float: left";
-        leftDiv.appendChild(makeButton("&lt;", prevMonth));
-        leftDiv.appendChild(makeButton("&gt;", nextMonth));
-        leftDiv.appendChild(makeButton("Сегодня", currentMonth));
-        leftDiv.appendChild(makeButton("+", addEvent));
-
-        var rightDiv = document.createElement("div");
-        rightDiv.style.cssText = "float: right";
-        rightDiv.appendChild(makeButton("Месяц"));
-        rightDiv.appendChild(makeButton("Неделя"));
-
-        var h2 = element("h2", "calendar__title", MONTH_NAMES[month] + " " + year);
-
-        buttonDiv.appendChild(leftDiv);
-        buttonDiv.appendChild(rightDiv);
-        buttonDiv.appendChild(h2);
-
-        return buttonDiv;
+        if (xhr.status == 200) {
+            var wrapper = document.createElement("div");
+            wrapper.innerHTML = xhr.responseText;
+            return wrapper.firstElementChild;
+        }
     }
 
     /**
@@ -179,12 +159,12 @@ function Calendar(options) {
      * @returns {Element}
      */
     function makeMonthTable() {
-        var table = element("table", "calendar__month-table");
+        var table = element("table", "calendar__grid");
 
         //make thead
         var tr = element("tr");
         for (var i = 0; i < WEEK_NAMES.length; i++) {
-            var th = element("th", "calendar__weeks", WEEK_NAMES[i]);
+            var th = element("th", "calendar__week", WEEK_NAMES[i]);
             tr.appendChild(th);
         }
         table.appendChild(element("thead")).appendChild(tr);
@@ -214,10 +194,10 @@ function Calendar(options) {
      * @param {HTMLTableElement} table
      */
     function fillTableWithDays(table) {
-        var eventsTable = element("table", "calendar__day-info");
+        var eventsTable = element("table", "calendar__day_info");
         eventsTable.appendChild(element("thead"))
                    .appendChild(element("tr"))
-                   .appendChild(element("th", "calendar__day-date"));
+                   .appendChild(element("th", "calendar__day_date"));
 
         var date = new Date(year, month, 1);
         var today = new Date();
@@ -238,7 +218,7 @@ function Calendar(options) {
             var th = eventsTableClone.getElementsByTagName("th")[0];
             th.textContent = date.getDate();
             if (j >= 5)
-                th.classList.add("calendar__day-date-weekend");
+                th.classList.add("calendar__day_date-weekend");
             eventsTableClone.dataset.date = date.toDateString();
 
             table.rows[i].cells[j].appendChild(eventsTableClone);
@@ -255,7 +235,7 @@ function Calendar(options) {
 
         //adjacent month days
         th = eventsTable.getElementsByTagName("th")[0];
-        th.classList.add("calendar__day-date-adjacent");
+        th.classList.add("calendar__day_date-adjacent");
 
         //next month days
         for (; i < table.rows.length; i++) {
@@ -315,7 +295,7 @@ function Calendar(options) {
                 eventTable.appendChild(tbody);
             }
 
-            var td = element("td", "calendar__day-event", printEvent(monthEvents[i]), true);
+            var td = element("td", "calendar__day_event", printEvent(monthEvents[i]), true);
             td.setAttribute("data-event-id", monthEvents[i].id);
             tbody.appendChild(element("tr"))
                  .appendChild(td);
@@ -325,18 +305,18 @@ function Calendar(options) {
     /**
      * Устанавливет заголовок текущего экрана календаря в зависимости от значений {@link month} и {@link year}.
      */
-    function fillMonthHeader() {
-        var header = rootElement.getElementsByTagName("h2")[0];
+    function updateMonthHeader() {
+        var header = rootElement.querySelector(".calendar__title");
         header.textContent = MONTH_NAMES[month] + " " + year;
     }
 
     /**
-     * Обновляет текущий экран месячного календаря.
+     * Обновляет данные календаря в зависимости от значений {@link month} и {@link year}.
      */
-    function updateMonthTable() {
-        fillMonthHeader();
+    function updateCalendar() {
+        updateMonthHeader();
 
-        var table = rootElement.getElementsByClassName("calendar__month-table")[0];
+        var table = rootElement.querySelector(".calendar__grid");
         table.parentNode.replaceChild(makeMonthTable(), table);
     }
 
@@ -350,7 +330,7 @@ function Calendar(options) {
             year++;
         }
 
-        updateMonthTable();
+        updateCalendar();
     }
 
     /**
@@ -363,7 +343,7 @@ function Calendar(options) {
             year--;
         }
 
-        updateMonthTable();
+        updateCalendar();
     }
 
     /**
@@ -374,7 +354,7 @@ function Calendar(options) {
         month = date.getMonth();
         year = date.getFullYear();
 
-        updateMonthTable();
+        updateCalendar();
     }
 
     /**
@@ -389,7 +369,7 @@ function Calendar(options) {
 
             year = event.date.getFullYear();
             month = event.date.getMonth();
-            updateMonthTable();
+            updateCalendar();
         };
     }
 
@@ -409,7 +389,7 @@ function Calendar(options) {
             var date = new Date();
             year = date.getFullYear();
             month = date.getMonth();
-            updateMonthTable();
+            updateCalendar();
         };
 
         eventWindow.onOKListener = function (event) {
@@ -418,7 +398,7 @@ function Calendar(options) {
 
             year = event.date.getFullYear();
             month = event.date.getMonth();
-            updateMonthTable();
+            updateCalendar();
         }
     }
 

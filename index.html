@@ -9,13 +9,18 @@
 </head>
 
 <body>
+
+<div id="container" style="text-align: center">
+
+</div>
+
 </body>
 
 <script src="Calendar.js"></script>
 <script src="CalendarEvent.js"></script>
 <script>
     var calendar = new Calendar();
-    document.body.appendChild(calendar.getElement());
+    document.getElementById("container").appendChild(calendar.getElement());
     calendar.notifyEvents();
 </script>
 
