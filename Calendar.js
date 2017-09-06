@@ -98,7 +98,13 @@ function Calendar(options) {
             }
         };
 
-        //всплывающая подсказка
+        createTooltip();
+    }
+
+    /**
+     * Создает всплывающую подсказку
+     */
+    function createTooltip() {
         rootElement.onmouseover = function (event) {
             if (event.target.dataset.eventId) {
                 var eventId = event.target.dataset.eventId;
