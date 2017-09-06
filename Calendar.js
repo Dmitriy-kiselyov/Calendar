@@ -264,7 +264,7 @@ function Calendar(options) {
      * @param {HTMLTableElement} table
      */
     function fillGridWithEvents(table) {
-        var monthEvents = CalendarEvent.getMonthEvents(month);
+        var monthEvents = CalendarEvent.getMonthEvents(year, month);
         CalendarEvent.sort(monthEvents);
 
         var getTime = function (event) {

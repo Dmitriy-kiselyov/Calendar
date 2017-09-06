@@ -15,18 +15,11 @@
  */
 function CalendarEvent(title, description, date, hasTime, remindOption, id) {
     this.title = title;
-    if (description)
-        this.description = description;
-    else
-        this.description = null;
+    this.description = description || null;
     this.date = date;
     this.hasTime = hasTime;
     this.remindOption = remindOption;
-
-    if (id)
-        this.id = id;
-    else
-        this.id = "event_" + String(Math.random()).substr(2);
+    this.id = id || "event_" + String(Math.random()).substr(2);
 }
 
 /**
@@ -62,11 +55,7 @@ CalendarEvent.comparator = function (a, b) {
     if (a.date.getTime() != b.date.getTime())
         return a.date.getTime() - b.date.getTime();
 
-    if (a.title < b.title)
-        return -1;
-    else if (a.title > b.title)
-        return 1;
-    return 0;
+    return a.title < b.title ? -1 : a.title > b.title;
 };
 
 /**
@@ -79,15 +68,16 @@ CalendarEvent.sort = function (events) {
 
 /**
  * Выбирает события данного месяца из {@link localStorage}
+ * @param {number} year
  * @param {number} month
  * @returns {CalendarEvent[]}
  */
-CalendarEvent.getMonthEvents = function (month) {
+CalendarEvent.getMonthEvents = function (year, month) {
     var monthEvents = [];
 
     for (var i = 0; i < localStorage.length; i++) {
         var event = CalendarEvent.fromString(localStorage.getItem(localStorage.key(i)));
-        if (event.date.getMonth() == month)
+        if (event.date.getFullYear() == year && event.date.getMonth() == month)
             monthEvents.push(event);
     }
 
