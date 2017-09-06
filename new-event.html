@@ -10,40 +10,49 @@
 
 <body>
 
-<div class="event-form" align="center">
+<div class="calendar__modal" style="margin-top: 50px">
+    <p class="calendar__modal__title">Новое событие</p>
     <form>
-
-        <p class="title">Новое событие</p>
-        <table>
+        <table class="calendar__modal__table">
             <tbody>
             <tr>
-                <td class="label required">Наименование</td>
                 <td>
-                    <input type="text" name="title" maxlength="20">
+                    <label class="required">Наименование</label>
+                </td>
+                <td>
+                    <input type="text" name="title" maxlength="30">
                 </td>
             </tr>
             <tr>
-                <td class="label">Описание</td>
                 <td>
-                    <textarea name="description" maxlength="150"></textarea>
+                    <label>Описание</label>
+                </td>
+                <td>
+                    <textarea name="description" maxlength="200"></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="label required">Дата</td>
+                <td>
+                    <label class="required">Дата</label>
+                </td>
                 <td>
                     <!--<input type="date">-->
                     <input name="datepicker" type="text">
                 </td>
             </tr>
             <tr>
-                <td class="label">Время</td>
+                <td>
+                    <label class="label">Время</label>
+                </td>
                 <td>
                     <!--<input type="time">-->
                     <input name="timepicker" type="text">
                 </td>
             </tr>
             <tr>
-                <td class="label required">Напомнить</td>
+                <td>
+                    <label class="required">Напомнить</label>
+                </td>
                 <td>
                     <select name="remind">
                         <option value="no" selected>нет</option>
@@ -56,18 +65,18 @@
             <tr>
                 <td></td>
                 <td>
-                    <span class="error-message" hidden>Заполните пустые поля!</span>
+                    <span class="calendar__modal__error_message" hidden>Заполните пустые поля!</span>
                 </td>
             </tr>
             </tbody>
         </table>
 
-        <div class="buttons">
-            <input type="submit" value="ОК">
-            <input type="button" name="cancel" value="Отмена">
+        <div class="calendar__modal__buttons">
+            <a class="calendar__button calendar__button-ok">OK</a>
+            <a class="calendar__button calendar__button-cancel">Отмена</a>
         </div>
-
     </form>
+
 </div>
 
 </body>
@@ -100,7 +109,7 @@
         step: 30
     });
 
-    form.onsubmit = function () {
+    form.querySelector(".calendar__button-ok").onclick = function () {
         //trim all fields
         var fields = form.querySelectorAll("input, textarea");
         for (var i = 0; i < fields.length; i++)
@@ -118,10 +127,10 @@
             }
         }
         if (empty) {
-            form.getElementsByClassName("error-message")[0].hidden = false;
+            form.querySelector(".calendar__modal__error_message").hidden = false;
             return false;
         } else {
-            form.getElementsByClassName("error-message")[0].hidden = true;
+            form.querySelector(".calendar__modal__error_message").hidden = true;
         }
 
         //get information
@@ -144,7 +153,7 @@
         window.close();
     };
 
-    form.cancel.onclick = function () {
+    form.querySelector(".calendar__button-cancel").onclick = function () {
         if (onCancelListener)
             onCancelListener();
         window.close();
