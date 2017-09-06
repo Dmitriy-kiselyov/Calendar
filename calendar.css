@@ -72,23 +72,25 @@
 }
 
 .calendar__day {
+    padding: 0;
     border: 1px solid gray;
-    width: 120px;
-    min-width: 120px;
-    height: 120px;
+    width: 130px;
+    min-width: 130px;
+    height: 130px;
     vertical-align: top;
 }
 
 .calendar__day-today {
-    background-color: #faa732;
+    background-color: #ffc54c;
 }
 
 .calendar__day_info {
+    border-collapse: separate;
+    border-spacing: 0 2px;
     table-layout: fixed;
+
     width: 100%;
     border: none;
-    border-collapse: separate;
-    border-spacing: 2px;
 }
 
 .calendar__week {
@@ -97,6 +99,7 @@
 
 .calendar__day_date {
     float: right;
+    margin-right: 2px;
 
     text-align: right;
     font-size: 16px;
@@ -104,6 +107,7 @@
 
 .calendar__day_plus {
     float: left;
+    margin-left: 2px;
     opacity: 0;
 
     line-height: 22px;
@@ -132,15 +136,14 @@
 }
 
 .calendar__day_event {
-    border-radius: 3px;
-    padding: 2px;
+    padding: 2px 2px 2px 3px;
+
     background: #08c;
     color: #fafafa;
 
     text-align: left;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
     font-size: 12px;
     cursor: pointer;
 
@@ -159,23 +162,26 @@
 
     text-align: left;
     position: absolute;
-    width: 150px;
+    width: 160px;
     z-index: 1000;
     padding-left: 5px;
     padding-right: 5px;
     border: 1px solid white;
-    border-radius: 5px;
+    border-radius: 3px;
     font-size: small;
     white-space: pre-line;
     word-wrap: break-word;
 
-    transition: opacity 0.5s;
+    transition: opacity 300ms;
 }
 
-.calendar__tooltip h3 {
+.calendar__tooltip_title {
     margin: 5px;
+    font-weight: bold;
+    font-size: 14px;
 }
 
-.calendar__tooltip p {
+.calendar__tooltip_text {
     margin: 5px;
+    font-size: 12px;
 }

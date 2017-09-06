@@ -106,11 +106,11 @@ function Calendar(options) {
 
                 var tooltip = element("div", "calendar__tooltip");
                 tooltip.setAttribute("data-tooltip-event-id", eventId);
-                tooltip.appendChild(element("h3", null, calendarEvent.title, true));
+                tooltip.appendChild(element("p", "calendar__tooltip_title", calendarEvent.title));
                 if (calendarEvent.description)
-                    tooltip.appendChild(element("p", null, calendarEvent.description, true));
+                    tooltip.appendChild(element("p", "calendar__tooltip_text", calendarEvent.description));
 
-                //count coordinates
+                //Подсчет координат
                 var rect = event.target.getBoundingClientRect();
                 tooltip.style.left = rect.right + pageXOffset + 5 + "px";
                 tooltip.style.top = rect.top + pageYOffset + "px";
@@ -122,11 +122,11 @@ function Calendar(options) {
                     tooltip.style.opacity = "1";
                 }, 0);
 
-                //move tooltip left if windows is too small
+                //Отобразить слева, если окно маленькое
                 if (tooltip.offsetLeft + tooltip.offsetWidth > document.documentElement.clientWidth + pageXOffset)
                     tooltip.style.left = rect.left - tooltip.offsetWidth + pageXOffset - 5 + "px";
 
-                //move top if needed
+                //Отобразить сверху, если нужно
                 if (tooltip.offsetTop + tooltip.offsetHeight > document.documentElement.clientHeight + pageYOffset)
                     tooltip.style.top = rect.bottom - tooltip.offsetHeight + pageYOffset + "px";
 
@@ -267,18 +267,18 @@ function Calendar(options) {
         var monthEvents = CalendarEvent.getMonthEvents(month);
         CalendarEvent.sort(monthEvents);
 
-        var printEvent = function (event) {
+        var getTime = function (event) {
             if (event.hasTime) {
                 var h = event.date.getHours();
-                if (h < 10)
-                    h = "0" + h;
                 var m = event.date.getMinutes();
+
+                if (m == 0)
+                    return String(h);
                 if (m < 10)
                     m = "0" + m;
-                return h + ":" + m + " " + event.title;
+                return h + ":" + m;
             }
-            else
-                return event.title;
+            else return "";
         };
 
         for (var i = 0; i < monthEvents.length; i++) {
@@ -291,7 +291,11 @@ function Calendar(options) {
                 eventTable.appendChild(tbody);
             }
 
-            var td = element("td", "calendar__day_event", printEvent(monthEvents[i]), true);
+            var td = element("td", "calendar__day_event");
+            td.appendChild(element("b", null, getTime(monthEvents[i])));
+            td.appendChild(document.createTextNode(" "));
+            td.appendChild(document.createTextNode(monthEvents[i].title));
+
             td.setAttribute("data-event-id", monthEvents[i].id);
             tbody.appendChild(element("tr"))
                  .appendChild(td);
