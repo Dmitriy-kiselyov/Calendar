@@ -285,20 +285,15 @@ function Calendar(options) {
             var dateStr = monthEvents[i].date.toDateString();
             var eventTable = table.querySelector("[data-date='" + dateStr + "']");
 
-            var tbody = eventTable.getElementsByTagName("tbody")[0];
-            if (!tbody) {
-                tbody = element("tbody");
-                eventTable.appendChild(tbody);
-            }
+            //Новое событие
+            var eventElement = element("td", "calendar__day_event");
+            eventElement.appendChild(element("b", null, getTime(monthEvents[i])));
+            eventElement.appendChild(document.createTextNode(" "));
+            eventElement.appendChild(document.createTextNode(monthEvents[i].title));
+            eventElement.setAttribute("data-event-id", monthEvents[i].id);
 
-            var td = element("td", "calendar__day_event");
-            td.appendChild(element("b", null, getTime(monthEvents[i])));
-            td.appendChild(document.createTextNode(" "));
-            td.appendChild(document.createTextNode(monthEvents[i].title));
-
-            td.setAttribute("data-event-id", monthEvents[i].id);
-            tbody.appendChild(element("tr"))
-                 .appendChild(td);
+            //Добавить в DOM
+            eventTable.querySelector("tbody").appendChild(element("tr")).appendChild(eventElement);
         }
     }
 
@@ -466,12 +461,12 @@ function Calendar(options) {
         if (Notification.permission == "default") {
             Notification.requestPermission(function (permission) {
                 if (permission == "granted")
-                    notifyEvent(eventId);
+                    notifyEvent(eventId); //Разрешение получено, попробовать еще раз
             })
         }
-        //else permission granted
+        //иначе уже есть разрешение на показ события
 
-        //count date
+        //Подготовить данные к выводу
         var currentTime = new Date().getTime();
         var eventDate = new Date(event.date);
         var note = "";
@@ -488,10 +483,10 @@ function Calendar(options) {
         var eventTime = eventDate.getTime();
 
         var timeToEvent = eventTime - currentTime;
-        if (timeToEvent < 0) //time has passed
+        if (timeToEvent < 0) //Время вышло
             return;
 
-        //notify
+        //Оповестить
         return setTimeout(function () {
             new Notification(event.title, {
                 body: note + (event.description ? "\n" + event.description : "")
@@ -499,7 +494,7 @@ function Calendar(options) {
         }, timeToEvent);
     }
 
-    //open fields
+    //API
     this.getElement = getElement;
     this.nextMonth = nextMonth;
     this.prevMonth = prevMonth;
