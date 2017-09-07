@@ -13,6 +13,88 @@
     user-select: none;
 }
 
+/*Кнопки*/
+.calendar__button {
+    display: inline-block;
+    min-width: 20px;
+    height: 14px;
+    padding: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 12px;
+    vertical-align: middle;
+
+    outline: none;
+    border: none;
+    border-radius: 4px;
+
+    box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.15);
+    transition: background 300ms;
+}
+
+.calendar__button:active {
+    box-shadow: none !important;
+    line-height: 14px;
+}
+
+.calendar__button[disabled] {
+    background-color: #999;
+    box-shadow: none;
+    pointer-events: none;
+    line-height: 14px;
+}
+
+.calendar__button-large {
+    height: 20px;
+    font-size: 17px;
+    line-height: 17px;
+}
+
+.calendar__button-large:active {
+    line-height: 20px;
+}
+
+.calendar__button-large[disabled] {
+    line-height: 20px;
+}
+
+.calendar__button-nav {
+    background: #49afcd;
+    color: #fafafa;
+}
+
+.calendar__button-nav:hover {
+    background: #339bba;
+}
+
+.calendar__button-ok {
+    background: #5bb75b;
+    color: #fafafa;
+}
+
+.calendar__button-ok:hover {
+    background: #47a247;
+}
+
+.calendar__button-cancel {
+    background: #da4f49;
+    color: #fafafa;
+}
+
+.calendar__button-cancel:hover {
+    background: #d0312a;
+}
+
+.calendar__button-delete {
+    background: #363636;
+    color: #fafafa;
+}
+
+.calendar__button-delete:hover {
+    background: #222;
+}
+
 /*head*/
 
 .calendar__head {
@@ -26,43 +108,6 @@
 .calendar__title {
     font-size: 30px;
     text-align: center;
-}
-
-.calendar__nav {
-    display: inline-block;
-    min-width: 20px;
-    height: 20px;
-    padding: 5px;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 17px;
-    vertical-align: middle;
-
-    outline: none;
-    border: none;
-    border-radius: 4px;
-    box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.15);
-    background: #49afcd;
-    color: #fafafa;
-
-    transition: background 300ms;
-}
-
-.calendar__nav:hover {
-    background: #339bba;
-}
-
-.calendar__nav:active {
-    box-shadow: none !important;
-    line-height: 20px;
-}
-
-.calendar__nav[disabled] {
-    background-color: #999;
-    box-shadow: none;
-    pointer-events: none;
-    line-height: 20px;
 }
 
 /*calendar grid*/
@@ -154,6 +199,148 @@
 
 .calendar__day_event:hover {
     background: #006da3;
+}
+
+/*Модальное окно*/
+
+/*Треугольники*/
+.calendar__modal:before {
+    content: '';
+    width: 0;
+    height: 0;
+
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    margin-left: -20px;
+
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid gray;
+}
+
+.calendar__modal:after {
+    content: '';
+    width: 0;
+    height: 0;
+
+    position: absolute;
+    top: -19px;
+    left: 50%;
+    margin-left: -19px;
+
+    border-left: 19px solid transparent;
+    border-right: 19px solid transparent;
+    border-bottom: 19px solid white;
+}
+
+/*Разметка*/
+.calendar__modal {
+    position: absolute;
+    top: 50%;
+    margin-top: 20px;
+    left: 50%;
+    margin-left: -200px;
+    z-index: 999;
+
+    width: 400px;
+    box-sizing: border-box;
+
+    border: 1px solid gray;
+    border-radius: 5px;
+    background: white;
+    padding: 5px;
+    color: black;
+    cursor: default;
+
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    box-shadow: 0 3px 10px 5px rgba(0, 0, 0, 0.2);
+}
+
+.calendar__modal__table {
+    display: table;
+
+    width: 100%;
+    border-spacing: 5px 5px;
+}
+
+.calendar__modal__table td {
+    padding: 0;
+    margin: 0;
+}
+
+.calendar__modal__table td:first-child {
+    width: 1px; /*Фиксированная ширина*/
+    text-align: right;
+    vertical-align: top;
+}
+
+.calendar__modal__table td:last-child {
+    text-align: left;
+}
+
+.calendar__modal__buttons {
+    text-align: right;
+}
+
+/*Внешний вид элементов*/
+
+.calendar__modal__title {
+    font-size: 25px;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+.calendar__modal input {
+    font-size: 14px;
+    font-family: monospace;
+}
+
+.calendar__modal input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px;
+}
+
+.calendar__modal textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px;
+
+    vertical-align: top;
+
+    height: 100px;
+    resize: none;
+
+    font-size: 14px;
+}
+
+.calendar__modal select {
+    font-size: 14px;
+    padding: 2px;
+}
+
+.calendar__modal label {
+    font-size: 14px;
+}
+
+.calendar__modal label.required:after {
+    content: "*";
+    font-size: 14px;
+    font-family: monospace;
+    font-weight: bold;
+    color: red;
+}
+
+.calendar__modal input.error {
+    border: 1.5px solid red;
+}
+
+.calendar__modal__error_message {
+    color: red;
+    font-size: 12px;
 }
 
 /*tooltip*/
