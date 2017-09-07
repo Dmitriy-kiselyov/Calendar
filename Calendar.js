@@ -155,16 +155,21 @@ function Calendar(options) {
     }
 
     /**
-     * Возвращает шаблон
+     * Возвращает шаблон. Кеширует ответы, так что запрос каждого вида выполнится ровно один раз.
      * @param url путь к шаблону
      * @returns {string} html представление данных
      */
     function loadTemplate(url) {
+        loadTemplate.cache = loadTemplate.cache || {};
+        if (loadTemplate.cache.hasOwnProperty(url))
+            return loadTemplate.cache[url];
+
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, false);
         xhr.send();
 
         if (xhr.status == 200) {
+            loadTemplate.cache[url] = xhr.responseText;
             return xhr.responseText;
         }
     }
