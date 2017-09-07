@@ -1,5 +1,7 @@
 <div class="calendar__modal">
-    <p class="calendar__modal__title">Новое событие</p>
+    <p class="calendar__modal__title">
+        <%= edit ? "Редактировать событие" : "Новое событие" %>
+    </p>
     <form autocomplete="off">
         <table class="calendar__modal__table">
             <tbody>
@@ -8,7 +10,7 @@
                     <label class="required">Наименование</label>
                 </td>
                 <td>
-                    <input type="text" name="title" maxlength="30">
+                    <input type="text" name="title" maxlength="30" value='<%= edit ? event.title : "" %>'>
                 </td>
             </tr>
             <tr>
@@ -16,7 +18,7 @@
                     <label>Описание</label>
                 </td>
                 <td>
-                    <textarea name="description" maxlength="200"></textarea>
+                    <textarea name="description" maxlength="200"><%= edit ? event.description : "" %></textarea>
                 </td>
             </tr>
             <tr>
@@ -43,7 +45,7 @@
                 </td>
                 <td>
                     <select name="remind">
-                        <option value="no" selected>нет</option>
+                        <option value="no">нет</option>
                         <option value="1h">за 1 час</option>
                         <option value="5m">за 5 минут</option>
                         <option value="in_time">вовремя</option>
@@ -62,6 +64,9 @@
         <div class="calendar__modal__buttons">
             <a class="calendar__button calendar__button-ok">OK</a>
             <a class="calendar__button calendar__button-cancel">Отмена</a>
+            <% if (edit) {%>
+            <a class="calendar__button calendar__button-delete">Удалить</a>
+            <% } %>
         </div>
     </form>
 

@@ -137,13 +137,14 @@
 }
 
 .calendar__day_event {
+    position: relative; /*Для модального окна*/
+
     padding: 2px 2px 2px 3px;
 
     background: #08c;
     color: #fafafa;
 
     text-align: left;
-    overflow: hidden;
     white-space: nowrap;
     font-size: 12px;
     cursor: pointer;

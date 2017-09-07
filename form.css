@@ -47,6 +47,7 @@
     border-radius: 5px;
     background: white;
     padding: 5px;
+    color: black;
 
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -182,12 +183,12 @@
     background: #d0312a;
 }
 
-.calendar__button-remove {
+.calendar__button-delete {
     background: #363636;
     color: #fafafa;
 }
 
-.calendar__button-remove:hover {
+.calendar__button-delete:hover {
     background: #222;
 }
 

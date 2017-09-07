@@ -378,7 +378,8 @@ function Calendar(options) {
      * @param {Date} date дата, для которой будет создано событие
      */
     function addEvent(date) {
-        modalWindow.openNew(date,
+        modalWindow.openNew(
+            date,
             function okCallback(calendarEvent) {
                 //Сохранить событие
                 addNewEvent(calendarEvent);
@@ -387,7 +388,8 @@ function Calendar(options) {
                 month = calendarEvent.date.getMonth();
                 updateCalendar();
             },
-            undefined);
+            undefined
+        );
     }
 
     /**
@@ -398,25 +400,28 @@ function Calendar(options) {
      * @param {String} eventId Идентификатор события, хранимого в {@link localStorage}.
      */
     function editEvent(eventId) {
-        var eventWindow = window.open("edit-event.html?eventId=" + eventId);
-
-        eventWindow.onDeleteListener = function () {
-            deleteEvent(eventId);
-
-            var date = new Date();
-            year = date.getFullYear();
-            month = date.getMonth();
-            updateCalendar();
-        };
-
-        eventWindow.onOKListener = function (event) {
-            deleteEvent(eventId);
-            addNewEvent(event);
-
-            year = event.date.getFullYear();
-            month = event.date.getMonth();
-            updateCalendar();
-        }
+        modalWindow.openEdit(
+            CalendarEvent.fromId(eventId),
+            function okCallback(calendarEvent) {
+                //Сохранить событие
+                deleteEvent(eventId);
+                addNewEvent(calendarEvent);
+                //Открыть месяц с новым событием
+                year = event.date.getFullYear();
+                month = event.date.getMonth();
+                updateCalendar();
+            },
+            undefined,
+            function deleteCallback() {
+                //Удалить событие
+                deleteEvent(eventId);
+                //Открыть текущий месяц
+                var date = new Date();
+                year = date.getFullYear();
+                month = date.getMonth();
+                updateCalendar();
+            }
+        );
     }
 
     /**
@@ -512,11 +517,14 @@ function Calendar(options) {
 
         /**
          * Создает DOM элемент модального окна
-         * @param {Date} date изначальная дата нового события
+         * @param {Object} options опции
+         * @param {boolean} options.edit если true - редуктируем событие, иначе создаем новое
+         * @param {CalendarEvent} [options.event] событие, которое нужно редактировать
+         * @param {Date} [options.date] изначальная дата, для которой нужно создать новое событие
          */
-        function createModal(date) {
+        function createModal(options) {
             modal = element("div");
-            modal.innerHTML = loadTemplate("new-event.html");
+            modal.innerHTML = _.template(loadTemplate("modal_template.html"))(options);
             modal = modal.firstElementChild;
 
             //Заполнить дату и время
@@ -527,7 +535,7 @@ function Calendar(options) {
                 timepicker: false,
                 format: "d.m.Y",
                 dayOfWeekStart: 1,
-                value: date
+                value: options.date || options.event.date
             });
 
             //Можно выбрать время
@@ -536,6 +544,16 @@ function Calendar(options) {
                 format: "H:i",
                 step: 30
             });
+            if (options.event && options.event.hasTime) {
+                $(form.timepicker).datetimepicker({
+                    value: options.event.date
+                });
+            }
+
+            //Выбрать опцию "напомнить", если нужно
+            if (options.event) {
+                form.remind.querySelector("[value='" + options.event.remindOption + "']").selected = true;
+            }
         }
 
         /**
@@ -582,11 +600,13 @@ function Calendar(options) {
          * Срабатывает при нажатии на OK. Если все необходимые поля заполнены, возвращает новое событие.
          * @returns {(undefined|CalendarEvent)} событие, если все необходимые поля заполнены
          */
-        var getCalendarEvent = function () {
+        function getCalendarEvent() {
             if (!checkFields())
                 return;
 
             //Извлечь информацию
+            var form = modal.querySelector("form");
+
             var title = form.title.value;
             var descr = form.description.value;
             var date = new Date($(form.datepicker).datetimepicker("getValue"));
@@ -602,7 +622,7 @@ function Calendar(options) {
 
             //Вернуть новое событие
             return new CalendarEvent(title, descr, date, time != null, remindOption);
-        };
+        }
 
         /**
          * Закрывает окно при клике вне его
@@ -617,8 +637,9 @@ function Calendar(options) {
          * Навешивает обработчики событий на модальное окно.
          * @param {Function} [okCallback] срабатывает при нажатии OK, аргументом является созданное событие
          * @param {Function} [cancelCallback] срабатывает при нажатии CANCEL
+         * @param {Function} [deleteCallback] срабатывает при нажатии DELETE (только в режиме редактирования)
          */
-        function addListeners(okCallback, cancelCallback) {
+        function addListeners(okCallback, cancelCallback, deleteCallback) {
             var form = modal.querySelector("form");
 
             //Навесим обработчики
@@ -637,6 +658,15 @@ function Calendar(options) {
                     cancelCallback();
             };
 
+            var deleteButton = form.querySelector(".calendar__button-delete");
+            if (deleteButton) {
+                deleteButton.onclick = function () {
+                    closeModal();
+                    if (deleteCallback)
+                        deleteCallback();
+                };
+            }
+
             setTimeout(function () { //Чтобы сразу не закрыть окно
                 document.addEventListener("click", closeOnOuterClick);
             }, 0);
@@ -651,12 +681,28 @@ function Calendar(options) {
              */
             openNew: function (date, okCallback, cancelCallback) {
                 closeModal();
-                createModal(date);
+                createModal({edit: false, date: date});
                 addListeners(okCallback, cancelCallback);
 
                 //Расположим окно над соответствующей ячейкой
                 var dayElement = rootElement.querySelector("[data-date='" + date.toDateString() + "']").parentNode;
                 dayElement.appendChild(modal);
+            },
+            /**
+             * Открывает модальное окно для редактирования существующего события
+             * @param {CalendarEvent} event редактируемое событие
+             * @param {Function} [okCallback] срабатывает при нажатии OK, аргументом является созданное событие
+             * @param {Function} [cancelCallback] срабатывает при нажатии CANCEL
+             * @param {Function} [deleteCallback] срабатывает при нажатии DELETE
+             */
+            openEdit: function (event, okCallback, cancelCallback, deleteCallback) {
+                closeModal();
+                createModal({edit: true, event: event});
+                addListeners(okCallback, cancelCallback, deleteCallback);
+
+                //Расположим окно под соответствующим событием
+                var eventElement = rootElement.querySelector("[data-event-id='" + event.id + "']");
+                eventElement.appendChild(modal);
             },
             close: function () {
                 closeModal();
