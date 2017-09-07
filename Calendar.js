@@ -21,6 +21,12 @@ function Calendar(options) {
      * Отображаемый месяц.
      */
     var month;
+    /**
+     * Интерфейс модального окна
+     * @type {{openNew, close}}
+     */
+    var modalWindow = createModalWindow();
+
     if (options && options.hasOwnProperty("date"))
         setDate(options.date);
 
@@ -89,8 +95,8 @@ function Calendar(options) {
 
         rootElement.onclick = function (event) {
             if (event.target.classList.contains("calendar__day_plus")) { //Новое событие
-                var day = event.target.closest(".calendar__day_info").dataset.date;
-                addEvent(new Date(day));
+                var date = event.target.closest(".calendar__day_info").dataset.date;
+                addEvent(new Date(date));
             }
 
             if (event.target.dataset.eventId) { //Редактировать событие
@@ -369,98 +375,19 @@ function Calendar(options) {
      * Открывает диалоговое окно для создания события.
      * Если была нажата кнопка OK, событие добавляется в {@link localStorage}, а сам календарь обновляется.
      *
-     * @param {Date} day Для какого дня создается событие
+     * @param {Date} date дата, для которой будет создано событие
      */
-    function addEvent(day) {
-        var modal = element("div");
-        modal.innerHTML = loadTemplate("new-event.html");
-        modal = modal.firstElementChild;
-
-        //Расположим окно над соответствующей ячейкой
-        var dayElement = rootElement.querySelector("[data-date='" + day.toDateString() + "']").parentNode;
-        dayElement.appendChild(modal);
-
-        //Навесим обработчики
-        var form = modal.querySelector("form");
-
-        //Можно выбрать другую дату
-        $(form.datepicker).datetimepicker({
-            timepicker: false,
-            format: "d.m.Y",
-            dayOfWeekStart: 1,
-            value: day
-        });
-
-        //Можно выбрать время
-        $(form.timepicker).datetimepicker({
-            datepicker: false,
-            format: "H:i",
-            step: 30
-        });
-
-        form.querySelector(".calendar__button-ok").onclick = function () {
-            //Убрать пробелы с полей
-            var fields = form.querySelectorAll("input, textarea");
-            for (var i = 0; i < fields.length; i++)
-                fields[i].value = fields[i].value.trim();
-
-            //Проверка на пустые поля
-            fields = [form.title, form.datepicker];
-            var empty = false;
-            for (i = 0; i < fields.length; i++) {
-                if (!fields[i].value) {
-                    empty = true;
-                    fields[i].classList.add("error");
-                } else {
-                    fields[i].classList.remove("error");
-                }
-            }
-            if (empty) {
-                form.querySelector(".calendar__modal__error_message").hidden = false;
-                return false;
-            } else {
-                form.querySelector(".calendar__modal__error_message").hidden = true;
-            }
-
-            //get information
-            var title = form.title.value;
-            var descr = form.description.value;
-            var date = new Date($(form.datepicker).datetimepicker("getValue"));
-            var time = $(form.timepicker).datetimepicker("getValue");
-            if (time != null) {
-                date.setHours(time.getHours());
-                date.setMinutes(time.getMinutes());
-            }
-            var remindOption = form.remind.options[form.remind.selectedIndex].value;
-
-            //Сохранить событие
-            var calendarEvent = new CalendarEvent(title, descr, date, time != null, remindOption);
-            addNewEvent(calendarEvent);
-            //Открыть месяц с новым событием
-            year = calendarEvent.date.getFullYear();
-            month = calendarEvent.date.getMonth();
-            updateCalendar();
-
-            //Закрыть окно
-            closeModal();
-        };
-
-        form.querySelector(".calendar__button-cancel").onclick = function () {
-            closeModal();
-        };
-
-        setTimeout(function () { //Чтобы не обрабатывать текущий клик
-            document.addEventListener("click", function (event) {
-                if (!event.target.closest(".calendar__modal") && modal)
-                    closeModal();
-                document.removeEventListener("click", this);
-            });
-        }, 0);
-
-        function closeModal() {
-            modal.parentNode.removeChild(modal);
-            modal = undefined;
-        }
+    function addEvent(date) {
+        modalWindow.openNew(date,
+            function okCallback(calendarEvent) {
+                //Сохранить событие
+                addNewEvent(calendarEvent);
+                //Открыть месяц с новым событием
+                year = calendarEvent.date.getFullYear();
+                month = calendarEvent.date.getMonth();
+                updateCalendar();
+            },
+            undefined);
     }
 
     /**
@@ -578,6 +505,163 @@ function Calendar(options) {
                 body: note + (event.description ? "\n" + event.description : "")
             });
         }, timeToEvent);
+    }
+
+    function createModalWindow() {
+        var modal;
+
+        /**
+         * Создает DOM элемент модального окна
+         * @param {Date} date изначальная дата нового события
+         */
+        function createModal(date) {
+            modal = element("div");
+            modal.innerHTML = loadTemplate("new-event.html");
+            modal = modal.firstElementChild;
+
+            //Заполнить дату и время
+            var form = modal.querySelector("form");
+
+            //Можно выбрать другую дату
+            $(form.datepicker).datetimepicker({
+                timepicker: false,
+                format: "d.m.Y",
+                dayOfWeekStart: 1,
+                value: date
+            });
+
+            //Можно выбрать время
+            $(form.timepicker).datetimepicker({
+                datepicker: false,
+                format: "H:i",
+                step: 30
+            });
+        }
+
+        /**
+         * Закрывает окно
+         */
+        function closeModal() {
+            if (modal) {
+                modal.parentNode.removeChild(modal);
+                modal = undefined;
+                document.removeEventListener("click", closeOnOuterClick);
+            }
+        }
+
+        /**
+         * Проверяет обязательные поля модального окна. Выводит сообщение об ошибке, если хоть одно обязательное поле пустое.
+         * @returns {boolean} поля прошли проверку и данные можно считывать
+         */
+        function checkFields() {
+            var form = modal.querySelector("form");
+
+            //Убрать пробелы с полей
+            var fields = form.querySelectorAll("input, textarea");
+            for (var i = 0; i < fields.length; i++)
+                fields[i].value = fields[i].value.trim();
+
+            //Проверка на пустые поля
+            var empty = false;
+
+            fields = [form.title, form.datepicker];
+            for (i = 0; i < fields.length; i++) {
+                if (!fields[i].value) {
+                    empty = true;
+                    fields[i].classList.add("error");
+                } else {
+                    fields[i].classList.remove("error");
+                }
+            }
+
+            form.querySelector(".calendar__modal__error_message").hidden = !empty;
+            return !empty;
+        }
+
+        /**
+         * Срабатывает при нажатии на OK. Если все необходимые поля заполнены, возвращает новое событие.
+         * @returns {(undefined|CalendarEvent)} событие, если все необходимые поля заполнены
+         */
+        var getCalendarEvent = function () {
+            if (!checkFields())
+                return;
+
+            //Извлечь информацию
+            var title = form.title.value;
+            var descr = form.description.value;
+            var date = new Date($(form.datepicker).datetimepicker("getValue"));
+            var time = $(form.timepicker).datetimepicker("getValue");
+            if (time != null) {
+                date.setHours(time.getHours());
+                date.setMinutes(time.getMinutes());
+            }
+            var remindOption = form.remind.options[form.remind.selectedIndex].value;
+
+            //Закрыть окно
+            closeModal();
+
+            //Вернуть новое событие
+            return new CalendarEvent(title, descr, date, time != null, remindOption);
+        };
+
+        /**
+         * Закрывает окно при клике вне его
+         * @param event обычный click event
+         */
+        function closeOnOuterClick(event) {
+            if (!event.target.closest(".calendar__modal"))
+                closeModal();
+        }
+
+        /**
+         * Навешивает обработчики событий на модальное окно.
+         * @param {Function} [okCallback] срабатывает при нажатии OK, аргументом является созданное событие
+         * @param {Function} [cancelCallback] срабатывает при нажатии CANCEL
+         */
+        function addListeners(okCallback, cancelCallback) {
+            var form = modal.querySelector("form");
+
+            //Навесим обработчики
+            form.querySelector(".calendar__button-ok").onclick = function () {
+                var event = getCalendarEvent();
+                if (event) {
+                    closeModal();
+                    if (okCallback)
+                        okCallback(event);
+                }
+            };
+
+            form.querySelector(".calendar__button-cancel").onclick = function () {
+                closeModal();
+                if (cancelCallback)
+                    cancelCallback();
+            };
+
+            setTimeout(function () { //Чтобы сразу не закрыть окно
+                document.addEventListener("click", closeOnOuterClick);
+            }, 0);
+        }
+
+        return {
+            /**
+             * Открывает модальное окно для создания нового события
+             * @param {Date} date изначальная дата события
+             * @param {Function} [okCallback] срабатывает при нажатии OK, аргументом является созданное событие
+             * @param {Function} [cancelCallback] срабатывает при нажатии CANCEL
+             */
+            openNew: function (date, okCallback, cancelCallback) {
+                closeModal();
+                createModal(date);
+                addListeners(okCallback, cancelCallback);
+
+                //Расположим окно над соответствующей ячейкой
+                var dayElement = rootElement.querySelector("[data-date='" + date.toDateString() + "']").parentNode;
+                dayElement.appendChild(modal);
+            },
+            close: function () {
+                closeModal();
+            }
+        }
     }
 
     //API
