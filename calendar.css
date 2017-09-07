@@ -72,6 +72,7 @@
 }
 
 .calendar__day {
+    position: relative; /*Для модального окна*/
     padding: 0;
     border: 1px solid gray;
     width: 130px;

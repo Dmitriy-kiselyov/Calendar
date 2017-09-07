@@ -9,7 +9,7 @@
     position: absolute;
     top: -20px;
     left: 50%;
-    margin-left: -15px; /* - 5px for padding */
+    margin-left: -20px;
 
     border-left: 20px solid transparent;
     border-right: 20px solid transparent;
@@ -24,37 +24,33 @@
     position: absolute;
     top: -19px;
     left: 50%;
-    margin-left: -14px; /* - 5px for padding */
+    margin-left: -19px;
 
     border-left: 19px solid transparent;
     border-right: 19px solid transparent;
     border-bottom: 19px solid white;
 }
 
-.calendar__modal__triangle-down {
-    position: absolute;
-    top: -15px;
-    right: 50%;
-
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 20px solid red;
-}
-
 /*Разметка*/
 .calendar__modal {
-    position: relative;
-
-    border: 1px solid gray;
-    border-radius: 3px;
-    padding: 5px;
+    position: absolute;
+    top: 50%;
+    margin-top: 20px;
+    left: 50%;
+    margin-left: -200px;
+    z-index: 999;
 
     width: 400px;
+    box-sizing: border-box;
+
+    border: 1px solid gray;
+    border-radius: 5px;
+    background: white;
+    padding: 5px;
+
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-    box-shadow: 0 3px 5px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 10px 5px rgba(0, 0, 0, 0.2);
 }
 
 .calendar__modal__table {
@@ -73,6 +69,10 @@
     width: 1px; /*Фиксированная ширина*/
     text-align: right;
     vertical-align: top;
+}
+
+.calendar__modal__table td:last-child {
+    text-align: left;
 }
 
 .calendar__modal__buttons {

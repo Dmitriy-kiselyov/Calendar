@@ -1,18 +1,6 @@
-<!DOCTYPE html>
-
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <title>Новое событие</title>
-    <link rel="stylesheet" type="text/css" href="form.css">
-</head>
-
-<body>
-
-<div class="calendar__modal" style="margin-top: 50px">
+<div class="calendar__modal">
     <p class="calendar__modal__title">Новое событие</p>
-    <form>
+    <form autocomplete="off">
         <table class="calendar__modal__table">
             <tbody>
             <tr>
@@ -78,88 +66,3 @@
     </form>
 
 </div>
-
-</body>
-
-<!-- this should go after your </body> -->
-<link rel="stylesheet" type="text/css" href="datetimepicker/jquery.datetimepicker.min.css">
-<script src="datetimepicker/jquery.js"></script>
-<script src="datetimepicker/jquery.datetimepicker.full.min.js"></script>
-<script src="CalendarEvent.js"></script>
-
-<script>
-    var onOKListener; //function(event)
-    var onCancelListener; //function()
-
-    var form = document.forms[0];
-
-    var date = window.location.search.match(/\?date=(.+)/)[1];
-    date = new Date(decodeURI(date));
-
-    $(form.datepicker).datetimepicker({
-        timepicker: false,
-        format: "d.m.Y",
-        dayOfWeekStart: 1,
-        value: date
-    });
-
-    $(form.timepicker).datetimepicker({
-        datepicker: false,
-        format: "H:i",
-        step: 30
-    });
-
-    form.querySelector(".calendar__button-ok").onclick = function () {
-        //trim all fields
-        var fields = form.querySelectorAll("input, textarea");
-        for (var i = 0; i < fields.length; i++)
-            fields[i].value = fields[i].value.trim();
-
-        //check for empty fields
-        fields = [form.title, form.datepicker];
-        var empty = false;
-        for (i = 0; i < fields.length; i++) {
-            if (!fields[i].value) {
-                empty = true;
-                fields[i].classList.add("error");
-            } else {
-                fields[i].classList.remove("error");
-            }
-        }
-        if (empty) {
-            form.querySelector(".calendar__modal__error_message").hidden = false;
-            return false;
-        } else {
-            form.querySelector(".calendar__modal__error_message").hidden = true;
-        }
-
-        //get information
-        var title = form.title.value;
-        var descr = form.description.value;
-        var date = new Date($(form.datepicker).datetimepicker("getValue"));
-        var time = $(form.timepicker).datetimepicker("getValue");
-        if (time != null) {
-            date.setHours(time.getHours());
-            date.setMinutes(time.getMinutes());
-        }
-        var remindOption = form.remind.options[form.remind.selectedIndex].value;
-
-        //post event object
-        var calendarEvent = new CalendarEvent(title, descr, date, time != null, remindOption);
-        if (onOKListener)
-            onOKListener(calendarEvent);
-
-        //close
-        window.close();
-    };
-
-    form.querySelector(".calendar__button-cancel").onclick = function () {
-        if (onCancelListener)
-            onCancelListener();
-        window.close();
-    }
-
-
-</script>
-
-</html>

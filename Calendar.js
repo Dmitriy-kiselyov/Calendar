@@ -90,7 +90,7 @@ function Calendar(options) {
         rootElement.onclick = function (event) {
             if (event.target.classList.contains("calendar__day_plus")) { //Новое событие
                 var day = event.target.closest(".calendar__day_info").dataset.date;
-                addEvent(day);
+                addEvent(new Date(day));
             }
 
             if (event.target.dataset.eventId) { //Редактировать событие
@@ -366,21 +366,101 @@ function Calendar(options) {
     }
 
     /**
-     * Открывает страницу для создания нового события.
+     * Открывает диалоговое окно для создания события.
      * Если была нажата кнопка OK, событие добавляется в {@link localStorage}, а сам календарь обновляется.
      *
      * @param {Date} day Для какого дня создается событие
      */
     function addEvent(day) {
-        var eventWindow = window.open("new-event.html?date=" + day);
+        var modal = element("div");
+        modal.innerHTML = loadTemplate("new-event.html");
+        modal = modal.firstElementChild;
 
-        eventWindow.onOKListener = function (event) {
-            addNewEvent(event);
+        //Расположим окно над соответствующей ячейкой
+        var dayElement = rootElement.querySelector("[data-date='" + day.toDateString() + "']").parentNode;
+        dayElement.appendChild(modal);
 
-            year = event.date.getFullYear();
-            month = event.date.getMonth();
+        //Навесим обработчики
+        var form = modal.querySelector("form");
+
+        //Можно выбрать другую дату
+        $(form.datepicker).datetimepicker({
+            timepicker: false,
+            format: "d.m.Y",
+            dayOfWeekStart: 1,
+            value: day
+        });
+
+        //Можно выбрать время
+        $(form.timepicker).datetimepicker({
+            datepicker: false,
+            format: "H:i",
+            step: 30
+        });
+
+        form.querySelector(".calendar__button-ok").onclick = function () {
+            //Убрать пробелы с полей
+            var fields = form.querySelectorAll("input, textarea");
+            for (var i = 0; i < fields.length; i++)
+                fields[i].value = fields[i].value.trim();
+
+            //Проверка на пустые поля
+            fields = [form.title, form.datepicker];
+            var empty = false;
+            for (i = 0; i < fields.length; i++) {
+                if (!fields[i].value) {
+                    empty = true;
+                    fields[i].classList.add("error");
+                } else {
+                    fields[i].classList.remove("error");
+                }
+            }
+            if (empty) {
+                form.querySelector(".calendar__modal__error_message").hidden = false;
+                return false;
+            } else {
+                form.querySelector(".calendar__modal__error_message").hidden = true;
+            }
+
+            //get information
+            var title = form.title.value;
+            var descr = form.description.value;
+            var date = new Date($(form.datepicker).datetimepicker("getValue"));
+            var time = $(form.timepicker).datetimepicker("getValue");
+            if (time != null) {
+                date.setHours(time.getHours());
+                date.setMinutes(time.getMinutes());
+            }
+            var remindOption = form.remind.options[form.remind.selectedIndex].value;
+
+            //Сохранить событие
+            var calendarEvent = new CalendarEvent(title, descr, date, time != null, remindOption);
+            addNewEvent(calendarEvent);
+            //Открыть месяц с новым событием
+            year = calendarEvent.date.getFullYear();
+            month = calendarEvent.date.getMonth();
             updateCalendar();
+
+            //Закрыть окно
+            closeModal();
         };
+
+        form.querySelector(".calendar__button-cancel").onclick = function () {
+            closeModal();
+        };
+
+        setTimeout(function () { //Чтобы не обрабатывать текущий клик
+            document.addEventListener("click", function (event) {
+                if (!event.target.closest(".calendar__modal") && modal)
+                    closeModal();
+                document.removeEventListener("click", this);
+            });
+        }, 0);
+
+        function closeModal() {
+            modal.parentNode.removeChild(modal);
+            modal = undefined;
+        }
     }
 
     /**

@@ -3,7 +3,7 @@
  * @param {String} title Наименование события.
  * @param {?String} description Описание события.
  * @param {Date} date Когда событие произойдет.
- * @param {bool} hasTime <i>true</i> - Событие произойдет в точное время, указанное в параметре date.
+ * @param {boolean} hasTime <i>true</i> - Событие произойдет в точное время, указанное в параметре date.
  * <i>false</i> - событие длится весь день.
  * @param {String} remindOption Содержит 4 возможных вариатна:
  * "no" - событие без уведомления;
