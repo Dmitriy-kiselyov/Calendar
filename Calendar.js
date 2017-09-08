@@ -412,8 +412,8 @@ function Calendar(options) {
                 deleteEvent(eventId);
                 addNewEvent(calendarEvent);
                 //Открыть месяц с новым событием
-                year = event.date.getFullYear();
-                month = event.date.getMonth();
+                year = calendarEvent.date.getFullYear();
+                month = calendarEvent.date.getMonth();
                 updateCalendar();
             },
             undefined,
