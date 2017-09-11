@@ -399,7 +399,8 @@
     white-space: pre-line;
     word-wrap: break-word;
 
-    transition: opacity 300ms;
+    animation-name: fadein;
+    animation-duration: 300ms;
 }
 
 .calendar__tooltip_title {
@@ -411,4 +412,15 @@
 .calendar__tooltip_text {
     margin: 5px;
     font-size: 12px;
+}
+
+/*Анимация*/
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }

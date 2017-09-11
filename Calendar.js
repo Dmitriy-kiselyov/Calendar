@@ -769,35 +769,29 @@ function Calendar(options) {
             var eventId = target.dataset.eventId;
             var calendarEvent = CalendarEvent.fromId(eventId);
 
-            var tooltip = element("div", "calendar__tooltip");
-            tooltip.setAttribute("data-tooltip-event-id", eventId);
-            tooltip.appendChild(element("p", "calendar__tooltip_title", calendarEvent.title));
+            currentTooltip = element("div", "calendar__tooltip");
+            currentTooltip.appendChild(element("p", "calendar__tooltip_title", calendarEvent.title));
             if (calendarEvent.description)
-                tooltip.appendChild(element("p", "calendar__tooltip_text", calendarEvent.description));
+                currentTooltip.appendChild(element("p", "calendar__tooltip_text", calendarEvent.description));
 
             //Подсчет координат
             var rect = target.getBoundingClientRect();
-            tooltip.style.left = rect.right + 5 + "px";
-            tooltip.style.top = rect.top + "px";
+            currentTooltip.style.left = rect.right + 5 + "px";
+            currentTooltip.style.top = rect.top + "px";
 
-            //Анимация
-            tooltip.style.opacity = "0";
-            rootElement.querySelector(".calendar__grid").appendChild(tooltip);
-            setTimeout(function () {
-                tooltip.style.opacity = "1";
-            }, 0);
+            //Вставить в DOM
+            rootElement.appendChild(currentTooltip);
 
             //Отобразить слева, если не вмещается справа
-            if (tooltip.offsetLeft + tooltip.offsetWidth > document.documentElement.clientWidth)
-                tooltip.style.left = rect.left - tooltip.offsetWidth - 5 + "px";
+            if (currentTooltip.offsetLeft + currentTooltip.offsetWidth > document.documentElement.clientWidth)
+                currentTooltip.style.left = rect.left - currentTooltip.offsetWidth - 5 + "px";
 
             //Отобразить сверху, если не вмещается снизу
-            if (tooltip.offsetTop + tooltip.offsetHeight > document.documentElement.clientHeight)
-                tooltip.style.top = rect.bottom - tooltip.offsetHeight + "px";
+            if (currentTooltip.offsetTop + currentTooltip.offsetHeight > document.documentElement.clientHeight)
+                currentTooltip.style.top = rect.bottom - currentTooltip.offsetHeight + "px";
 
-            //Запомнить элемент и подсказку
+            //Запомнить элемент
             currentTarget = target;
-            currentTooltip = tooltip;
         }
 
         /**
@@ -816,14 +810,7 @@ function Calendar(options) {
                 target = target.parentNode;
             }
 
-            //Переход с события
-            var eventId = currentTarget.dataset.eventId;
-            var tooltip = rootElement.querySelector(".calendar__tooltip[data-tooltip-event-id='" + eventId + "']");
-            if (tooltip)
-                tooltip.parentNode.removeChild(tooltip);
-
-            currentTarget = null;
-            currentTooltip = null;
+            clearTooltip();
         }
 
         /**
