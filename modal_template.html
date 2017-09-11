@@ -62,11 +62,16 @@
         </table>
 
         <div class="calendar__modal__buttons">
-            <a class="calendar__button calendar__button-ok">OK</a>
-            <a class="calendar__button calendar__button-cancel">Отмена</a>
             <% if (edit) {%>
-            <a class="calendar__button calendar__button-delete">Удалить</a>
+            <div style="float: left">
+                <a class="calendar__button calendar__button-delete">Удалить</a>
+            </div>
             <% } %>
+
+            <div style="float: right">
+                <a class="calendar__button calendar__button-ok">OK</a>
+                <a class="calendar__button calendar__button-cancel">Отмена</a>
+            </div>
         </div>
     </form>
 

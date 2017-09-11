@@ -210,13 +210,13 @@
     height: 0;
 
     position: absolute;
-    top: -20px;
+    top: -10px;
     left: 50%;
-    margin-left: -20px;
+    margin-left: -10px;
 
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-bottom: 20px solid gray;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid gray;
 }
 
 .calendar__modal:after {
@@ -225,20 +225,36 @@
     height: 0;
 
     position: absolute;
-    top: -19px;
+    top: -9px;
     left: 50%;
-    margin-left: -19px;
+    margin-left: -9px;
 
-    border-left: 19px solid transparent;
-    border-right: 19px solid transparent;
-    border-bottom: 19px solid white;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid white;
+}
+
+/*Анимация появления*/
+@keyframes zoom {
+    from {
+        transform: scale(0.5);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.calendar__modal {
+    animation-name: zoom;
+    animation-duration: 300ms;
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /*Разметка*/
 .calendar__modal {
     position: absolute;
     top: 50%;
-    margin-top: 20px;
+    margin-top: 10px;
     left: 50%;
     margin-left: -200px;
     z-index: 999;
@@ -281,7 +297,7 @@
 }
 
 .calendar__modal__buttons {
-    text-align: right;
+    overflow: auto;
 }
 
 /*Внешний вид элементов*/
