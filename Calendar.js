@@ -528,6 +528,8 @@ function Calendar(options) {
                 modal.parentNode.removeChild(modal);
                 modal = undefined;
                 document.removeEventListener("click", closeOnOuterClick);
+                //Восстановить подсказки
+                tooltips.enableTooltips();
             }
         }
 
@@ -711,6 +713,9 @@ function Calendar(options) {
                 var dayElement = rootElement.querySelector("[data-date='" + date.toDateString() + "']").firstElementChild;
                 rootElement.appendChild(modal);
                 showModalFor(dayElement);
+
+                //Отключить подсказки
+                tooltips.disableTooltips();
             },
             /**
              * Открывает модальное окно для редактирования существующего события
@@ -728,6 +733,9 @@ function Calendar(options) {
                 var eventElement = rootElement.querySelector("[data-event-id='" + event.id + "']");
                 rootElement.appendChild(modal);
                 showModalFor(eventElement);
+
+                //Отключить подсказки
+                tooltips.disableTooltips();
             },
             close: function () {
                 closeModal();
