@@ -727,14 +727,17 @@ function Calendar(options) {
             var centerX = elementRect.left + elementRect.width / 2 - rootRect.left;
             var centerY = elementRect.top + elementRect.height / 2 - rootRect.top;
 
+            //Определить положение окна
+            var arrow = modal.querySelector(".calendar__modal__arrow");
+
             //Определить вертикальное положение окна
             if (centerY + 10 + modal.offsetHeight > rootRect.bottom) {
                 //окно нужно отобразить вверху
-                modal.classList.add("calendar__modal-top");
+                arrow.classList.add("calendar__modal__arrow-top");
                 var y = centerY - modal.offsetHeight - 10;
             } else {
                 //окно нужно отобразить снизу
-                modal.classList.add("calendar__modal-bottom");
+                arrow.classList.add("calendar__modal__arrow-bottom");
                 y = centerY + 10;
             }
 
@@ -744,11 +747,13 @@ function Calendar(options) {
             var x = centerX - modal.offsetWidth / 2;
             if (x < 0) { //Выход за левую границу
                 x = 0;
+                arrow.style.left = centerX + "px";
             }
 
             //Правая граница
             if (x + modal.offsetWidth > rootRect.width) { //Выход за правую границу
                 x = rootRect.width - modal.offsetWidth;
+                arrow.style.left = centerX - x + "px";
             }
 
             //Изменить положение окна

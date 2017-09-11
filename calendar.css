@@ -203,47 +203,59 @@
 /*Модальное окно*/
 
 /*Треугольники*/
+.calendar__modal__arrow {
+    position: absolute;
+    left: 50%; /*can be changed by js if needed*/
+    margin-left: -10px;
+}
+
 .calendar__modal__arrow-outer {
+    position: absolute;
+    top: 0;
+    left: 0;
+
     width: 0;
     height: 0;
-
-    position: absolute;
-    left: 50%;
-    margin-left: -10px;
 
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
 }
 
 .calendar__modal__arrow-inner {
+    position: absolute;
+    top: 0;
+    left: 1px;
+
     width: 0;
     height: 0;
-
-    position: absolute;
-    left: 50%;
-    margin-left: -9px;
 
     border-left: 9px solid transparent;
     border-right: 9px solid transparent;
 }
 
-.calendar__modal-bottom > .calendar__modal__arrow-outer {
+.calendar__modal__arrow-bottom {
     top: -10px;
+}
+
+.calendar__modal__arrow-bottom > .calendar__modal__arrow-outer {
     border-bottom: 10px solid gray;
 }
 
-.calendar__modal-bottom > .calendar__modal__arrow-inner {
-    top: -9px;
+.calendar__modal__arrow-bottom > .calendar__modal__arrow-inner {
+    top: 1px;
     border-bottom: 9px solid white;
 }
 
-.calendar__modal-top > .calendar__modal__arrow-outer {
-    bottom: -10px;
+.calendar__modal__arrow-top {
+    bottom: 0;
+}
+
+.calendar__modal__arrow-top > .calendar__modal__arrow-outer {
     border-top: 10px solid gray;
 }
 
-.calendar__modal-top > .calendar__modal__arrow-inner {
-    bottom: -9px;
+.calendar__modal__arrow-top > .calendar__modal__arrow-inner {
+    bottom: 1px;
     border-top: 9px solid white;
 }
 
