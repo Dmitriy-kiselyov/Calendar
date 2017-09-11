@@ -203,8 +203,7 @@
 /*Модальное окно*/
 
 /*Треугольники*/
-.calendar__modal:before {
-    content: '';
+.calendar__modal__arrow-outer {
     width: 0;
     height: 0;
 
@@ -216,8 +215,7 @@
     border-right: 10px solid transparent;
 }
 
-.calendar__modal:after {
-    content: '';
+.calendar__modal__arrow-inner {
     width: 0;
     height: 0;
 
@@ -229,22 +227,22 @@
     border-right: 9px solid transparent;
 }
 
-.calendar__modal-bottom:before {
+.calendar__modal-bottom > .calendar__modal__arrow-outer {
     top: -10px;
     border-bottom: 10px solid gray;
 }
 
-.calendar__modal-bottom:after {
+.calendar__modal-bottom > .calendar__modal__arrow-inner {
     top: -9px;
     border-bottom: 9px solid white;
 }
 
-.calendar__modal-top:before {
+.calendar__modal-top > .calendar__modal__arrow-outer {
     bottom: -10px;
     border-top: 10px solid gray;
 }
 
-.calendar__modal-top:after {
+.calendar__modal-top > .calendar__modal__arrow-inner {
     bottom: -9px;
     border-top: 9px solid white;
 }
