@@ -137,8 +137,8 @@ function Calendar(options) {
 
             //Подсчет координат
             var rect = target.getBoundingClientRect();
-            tooltip.style.left = rect.right + pageXOffset + 5 + "px";
-            tooltip.style.top = rect.top + pageYOffset + "px";
+            tooltip.style.left = rect.right + 5 + "px";
+            tooltip.style.top = rect.top + "px";
 
             //animation
             tooltip.style.opacity = "0";
@@ -148,12 +148,12 @@ function Calendar(options) {
             }, 0);
 
             //Отобразить слева, если окно маленькое
-            if (tooltip.offsetLeft + tooltip.offsetWidth > document.documentElement.clientWidth + pageXOffset)
-                tooltip.style.left = rect.left - tooltip.offsetWidth + pageXOffset - 5 + "px";
+            if (tooltip.offsetLeft + tooltip.offsetWidth > document.documentElement.clientWidth)
+                tooltip.style.left = rect.left - tooltip.offsetWidth - 5 + "px";
 
             //Отобразить сверху, если нужно
-            if (tooltip.offsetTop + tooltip.offsetHeight > document.documentElement.clientHeight + pageYOffset)
-                tooltip.style.top = rect.bottom - tooltip.offsetHeight + pageYOffset + "px";
+            if (tooltip.offsetTop + tooltip.offsetHeight > document.documentElement.clientHeight)
+                tooltip.style.top = rect.bottom - tooltip.offsetHeight + "px";
 
             //Запомнить элемент
             currentTarget = target;
@@ -163,7 +163,7 @@ function Calendar(options) {
             if (!currentTarget)
                 return;
             var target = event.relatedTarget;
-            while (target !== rootElement) {
+            while (target && target !== rootElement) {
                 if (target === currentTarget)
                     return;
                 target = target.parentNode;
@@ -702,6 +702,31 @@ function Calendar(options) {
             }, 0);
         }
 
+        /**
+         * Выводит модальное окно для следующего элемента
+         * @param element
+         */
+        function showModalFor(element) {
+            //Найдем центр элемента относительно календаря
+            var elementRect = element.getBoundingClientRect();
+            var rootRect = rootElement.getBoundingClientRect();
+            var centerX = elementRect.left + elementRect.width / 2 - rootRect.left;
+            var centerY = elementRect.top + elementRect.height / 2 - rootRect.top;
+
+            //Отобразить элемент для последующих вычислений
+            rootElement.appendChild(modal);
+            var modalRect = modal.getBoundingClientRect();
+
+            //Разместить окно снизу по центру
+            modal.classList.add("calendar__modal-bottom");
+
+            var x = centerX - modalRect.width;
+            var y = centerY + 10;
+
+            modal.style.left = x + "px";
+            modal.style.top = y + "px";
+        }
+
         return {
             /**
              * Открывает модальное окно для создания нового события
@@ -716,7 +741,7 @@ function Calendar(options) {
 
                 //Расположим окно над соответствующей ячейкой
                 var dayElement = rootElement.querySelector("[data-date='" + date.toDateString() + "']").parentNode;
-                dayElement.appendChild(modal);
+                showModalFor(dayElement);
             },
             /**
              * Открывает модальное окно для редактирования существующего события
@@ -732,7 +757,7 @@ function Calendar(options) {
 
                 //Расположим окно под соответствующим событием
                 var eventElement = rootElement.querySelector("[data-event-id='" + event.id + "']");
-                eventElement.appendChild(modal);
+                showModalFor(eventElement);
             },
             close: function () {
                 closeModal();

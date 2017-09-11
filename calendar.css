@@ -1,6 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700&subset=latin,latin-ext);
 
 .calendar {
+    position: relative; /*Для модального окна*/
     display: inline-block;
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -117,7 +118,6 @@
 }
 
 .calendar__day {
-    position: relative; /*Для модального окна*/
     padding: 0;
     border: 1px solid gray;
     width: 130px;
@@ -182,8 +182,6 @@
 }
 
 .calendar__day_event {
-    position: relative; /*Для модального окна*/
-
     padding: 2px 2px 2px 3px;
 
     background: #08c;
@@ -191,6 +189,7 @@
 
     text-align: left;
     white-space: nowrap;
+    overflow: hidden;
     font-size: 12px;
     cursor: pointer;
 
@@ -210,13 +209,11 @@
     height: 0;
 
     position: absolute;
-    top: -10px;
     left: 50%;
     margin-left: -10px;
 
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 10px solid gray;
 }
 
 .calendar__modal:after {
@@ -225,13 +222,31 @@
     height: 0;
 
     position: absolute;
-    top: -9px;
     left: 50%;
     margin-left: -9px;
 
     border-left: 9px solid transparent;
     border-right: 9px solid transparent;
+}
+
+.calendar__modal-bottom:before {
+    top: -10px;
+    border-bottom: 10px solid gray;
+}
+
+.calendar__modal-bottom:after {
+    top: -9px;
     border-bottom: 9px solid white;
+}
+
+.calendar__modal-top:before {
+    bottom: -10px;
+    border-top: 10px solid gray;
+}
+
+.calendar__modal-top:after {
+    bottom: -9px;
+    border-top: 9px solid white;
 }
 
 /*Анимация появления*/
@@ -253,10 +268,6 @@
 /*Разметка*/
 .calendar__modal {
     position: absolute;
-    top: 50%;
-    margin-top: 10px;
-    left: 50%;
-    margin-left: -200px;
     z-index: 999;
 
     width: 400px;
@@ -362,16 +373,17 @@
 /*tooltip*/
 
 .calendar__tooltip {
-    background: #006da3;
-    color: #fafafa;
-
-    text-align: left;
-    position: absolute;
-    width: 160px;
+    position: fixed;
     z-index: 1000;
+
+    width: 160px;
     padding-left: 5px;
     padding-right: 5px;
     border: 1px solid white;
+
+    background: #006da3;
+    color: #fafafa;
+    text-align: left;
     border-radius: 3px;
     font-size: small;
     white-space: pre-line;
