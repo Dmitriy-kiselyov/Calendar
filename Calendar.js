@@ -703,26 +703,55 @@ function Calendar(options) {
         }
 
         /**
-         * Выводит модальное окно для следующего элемента
-         * @param element
+         * Позиционирует модальное окно таким образом, чтобы оно выходило из центра элемента
+         * @param {HTMLElement} element элемент
          */
         function showModalFor(element) {
+            function getAbsoluteRect(element) {
+                var rect = element.getBoundingClientRect();
+                return {
+                    left: rect.left + pageXOffset,
+                    right: rect.right + pageXOffset,
+                    top: rect.top + pageYOffset,
+                    bottom: rect.bottom + pageYOffset,
+                    width: rect.width,
+                    height: rect.height
+                }
+            }
+
+            //Размеры и положение элементов
+            var elementRect = getAbsoluteRect(element);
+            var rootRect = getAbsoluteRect(rootElement);
+
             //Найдем центр элемента относительно календаря
-            var elementRect = element.getBoundingClientRect();
-            var rootRect = rootElement.getBoundingClientRect();
             var centerX = elementRect.left + elementRect.width / 2 - rootRect.left;
             var centerY = elementRect.top + elementRect.height / 2 - rootRect.top;
 
-            //Отобразить элемент для последующих вычислений
-            rootElement.appendChild(modal);
-            var modalRect = modal.getBoundingClientRect();
+            //Определить вертикальное положение окна
+            if (centerY + 10 + modal.offsetHeight > rootRect.bottom) {
+                //окно нужно отобразить вверху
+                modal.classList.add("calendar__modal-top");
+                var y = centerY - modal.offsetHeight - 10;
+            } else {
+                //окно нужно отобразить снизу
+                modal.classList.add("calendar__modal-bottom");
+                y = centerY + 10;
+            }
 
-            //Разместить окно снизу по центру
-            modal.classList.add("calendar__modal-bottom");
+            //Определить горизонтальное положение окна
 
-            var x = centerX - modalRect.width;
-            var y = centerY + 10;
+            //Левая граница
+            var x = centerX - modal.offsetWidth / 2;
+            if (x < 0) { //Выход за левую границу
+                x = 0;
+            }
 
+            //Правая граница
+            if (x + modal.offsetWidth > rootRect.width) { //Выход за правую границу
+                x = rootRect.width - modal.offsetWidth;
+            }
+
+            //Изменить положение окна
             modal.style.left = x + "px";
             modal.style.top = y + "px";
         }
@@ -741,6 +770,7 @@ function Calendar(options) {
 
                 //Расположим окно над соответствующей ячейкой
                 var dayElement = rootElement.querySelector("[data-date='" + date.toDateString() + "']").parentNode;
+                rootElement.appendChild(modal);
                 showModalFor(dayElement);
             },
             /**
@@ -757,6 +787,7 @@ function Calendar(options) {
 
                 //Расположим окно под соответствующим событием
                 var eventElement = rootElement.querySelector("[data-event-id='" + event.id + "']");
+                rootElement.appendChild(modal);
                 showModalFor(eventElement);
             },
             close: function () {
