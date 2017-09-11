@@ -99,8 +99,8 @@ function Calendar(options) {
                 addEvent(new Date(date));
             }
 
-            if (event.target.dataset.eventId) { //Редактировать событие
-                editEvent(event.target.dataset.eventId);
+            if (event.target.closest("[data-event-id]")) { //Редактировать событие
+                editEvent(event.target.closest("[data-event-id]").dataset.eventId);
             }
         };
 
@@ -774,7 +774,7 @@ function Calendar(options) {
                 addListeners(okCallback, cancelCallback);
 
                 //Расположим окно над соответствующей ячейкой
-                var dayElement = rootElement.querySelector("[data-date='" + date.toDateString() + "']").parentNode;
+                var dayElement = rootElement.querySelector("[data-date='" + date.toDateString() + "']").firstElementChild;
                 rootElement.appendChild(modal);
                 showModalFor(dayElement);
             },
