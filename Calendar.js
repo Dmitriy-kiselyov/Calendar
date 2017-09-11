@@ -111,46 +111,71 @@ function Calendar(options) {
      * Создает всплывающую подсказку
      */
     function createTooltip() {
+        var currentTarget = null; //Запомним элемент, для которого выводится подсказка
+
         rootElement.onmouseover = function (event) {
-            if (event.target.dataset.eventId) {
-                var eventId = event.target.dataset.eventId;
-                var calendarEvent = CalendarEvent.fromId(eventId);
-
-                var tooltip = element("div", "calendar__tooltip");
-                tooltip.setAttribute("data-tooltip-event-id", eventId);
-                tooltip.appendChild(element("p", "calendar__tooltip_title", calendarEvent.title));
-                if (calendarEvent.description)
-                    tooltip.appendChild(element("p", "calendar__tooltip_text", calendarEvent.description));
-
-                //Подсчет координат
-                var rect = event.target.getBoundingClientRect();
-                tooltip.style.left = rect.right + pageXOffset + 5 + "px";
-                tooltip.style.top = rect.top + pageYOffset + "px";
-
-                //animation
-                tooltip.style.opacity = "0";
-                rootElement.querySelector(".calendar__grid").appendChild(tooltip);
-                setTimeout(function () {
-                    tooltip.style.opacity = "1";
-                }, 0);
-
-                //Отобразить слева, если окно маленькое
-                if (tooltip.offsetLeft + tooltip.offsetWidth > document.documentElement.clientWidth + pageXOffset)
-                    tooltip.style.left = rect.left - tooltip.offsetWidth + pageXOffset - 5 + "px";
-
-                //Отобразить сверху, если нужно
-                if (tooltip.offsetTop + tooltip.offsetHeight > document.documentElement.clientHeight + pageYOffset)
-                    tooltip.style.top = rect.bottom - tooltip.offsetHeight + pageYOffset + "px";
-
+            if (currentTarget) //Внутри события
+                return;
+            var target = event.target;
+            while (target !== rootElement) {
+                if (target.dataset.eventId)
+                    break;
+                target = target.parentNode;
             }
+            if (target === rootElement)
+                return;
+
+            //Переход на событие
+            var eventId = target.dataset.eventId;
+            var calendarEvent = CalendarEvent.fromId(eventId);
+
+            var tooltip = element("div", "calendar__tooltip");
+            tooltip.setAttribute("data-tooltip-event-id", eventId);
+            tooltip.appendChild(element("p", "calendar__tooltip_title", calendarEvent.title));
+            if (calendarEvent.description)
+                tooltip.appendChild(element("p", "calendar__tooltip_text", calendarEvent.description));
+
+            //Подсчет координат
+            var rect = target.getBoundingClientRect();
+            tooltip.style.left = rect.right + pageXOffset + 5 + "px";
+            tooltip.style.top = rect.top + pageYOffset + "px";
+
+            //animation
+            tooltip.style.opacity = "0";
+            rootElement.querySelector(".calendar__grid").appendChild(tooltip);
+            setTimeout(function () {
+                tooltip.style.opacity = "1";
+            }, 0);
+
+            //Отобразить слева, если окно маленькое
+            if (tooltip.offsetLeft + tooltip.offsetWidth > document.documentElement.clientWidth + pageXOffset)
+                tooltip.style.left = rect.left - tooltip.offsetWidth + pageXOffset - 5 + "px";
+
+            //Отобразить сверху, если нужно
+            if (tooltip.offsetTop + tooltip.offsetHeight > document.documentElement.clientHeight + pageYOffset)
+                tooltip.style.top = rect.bottom - tooltip.offsetHeight + pageYOffset + "px";
+
+            //Запомнить элемент
+            currentTarget = target;
         };
+
         rootElement.onmouseout = function (event) {
-            if (event.target.dataset.eventId) {
-                var eventId = event.target.dataset.eventId;
-                var tooltip = rootElement.querySelector(".calendar__tooltip[data-tooltip-event-id='" + eventId + "']");
-                if (tooltip)
-                    tooltip.parentNode.removeChild(tooltip);
+            if (!currentTarget)
+                return;
+            var target = event.relatedTarget;
+            while (target !== rootElement) {
+                if (target === currentTarget)
+                    return;
+                target = target.parentNode;
             }
+
+            //Переход с события
+            var eventId = currentTarget.dataset.eventId;
+            var tooltip = rootElement.querySelector(".calendar__tooltip[data-tooltip-event-id='" + eventId + "']");
+            if (tooltip)
+                tooltip.parentNode.removeChild(tooltip);
+
+            currentTarget = null;
         };
     }
 
