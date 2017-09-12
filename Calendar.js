@@ -453,7 +453,7 @@ function Calendar(options) {
         if (Notification.permission == "default") {
             Notification.requestPermission(function (permission) {
                 if (permission == "granted")
-                    notifyEvent(eventId); //Разрешение получено, попробовать еще раз
+                    notifyEvent(event); //Разрешение получено, попробовать еще раз
             })
         }
         //иначе уже есть разрешение на показ события
