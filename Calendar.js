@@ -106,11 +106,11 @@ function Calendar(options) {
         rootElement.onclick = function (event) {
             if (event.target.classList.contains("calendar__day_plus")) { //Новое событие
                 var date = event.target.closest(".calendar__day_info").dataset.date;
-                addEvent(new Date(date));
+                addEventModal(new Date(date));
             }
 
             if (event.target.closest("[data-event-id]")) { //Редактировать событие
-                editEvent(event.target.closest("[data-event-id]").dataset.eventId);
+                editEventModal(event.target.closest("[data-event-id]").dataset.eventId);
             }
         };
 
@@ -351,12 +351,12 @@ function Calendar(options) {
      *
      * @param {Date} date дата, для которой будет создано событие
      */
-    function addEvent(date) {
+    function addEventModal(date) {
         modalWindow.openNew(
             date,
             function okCallback(calendarEvent) {
                 //Сохранить событие
-                addNewEvent(calendarEvent);
+                addEvent(calendarEvent);
                 //Открыть месяц с новым событием
                 year = calendarEvent.date.getFullYear();
                 month = calendarEvent.date.getMonth();
@@ -373,13 +373,13 @@ function Calendar(options) {
      * Календарь обновляется.
      * @param {String} eventId Идентификатор события, хранимого в {@link localStorage}.
      */
-    function editEvent(eventId) {
+    function editEventModal(eventId) {
         modalWindow.openEdit(
             CalendarEvent.fromId(eventId),
             function okCallback(calendarEvent) {
                 //Сохранить событие
                 deleteEvent(eventId);
-                addNewEvent(calendarEvent);
+                addEvent(calendarEvent);
                 //Открыть месяц с новым событием
                 year = calendarEvent.date.getFullYear();
                 month = calendarEvent.date.getMonth();
@@ -402,7 +402,7 @@ function Calendar(options) {
      * Добавляет событие в {@link localStorage} и уведомления, если нужно.
      * @param {CalendarEvent} event Новое событие.
      */
-    function addNewEvent(event) {
+    function addEvent(event) {
         localStorage.setItem(event.id, event.toString());
         var intervalId = notifyEvent(event);
         if (intervalId)
@@ -916,7 +916,7 @@ function Calendar(options) {
             deleteEvent(calendarEvent.id);
 
             //Создаем новое и обновляем календарь
-            addNewEvent(calendarEvent);
+            addEvent(calendarEvent);
             updateCalendar();
         }
 
