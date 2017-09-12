@@ -424,3 +424,21 @@
         opacity: 1;
     }
 }
+
+/*Drag'n'Drop*/
+
+[draggable] {
+    transition: visibility 1ms;
+}
+
+.calendar__day_event.move {
+    visibility: hidden;
+}
+
+.calendar__day {
+    transition: background-color 300ms;
+}
+
+.calendar__day.over {
+    background-color: lightgrey;
+}

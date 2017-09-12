@@ -31,6 +31,11 @@ function Calendar(options) {
      * @type {{enableTooltips, disableTooltips}}
      */
     var tooltips = createTooltips();
+    /**
+     * Интерфейс переноса событий
+     * @type {{enableDrag, disableDrag}}
+     */
+    var dragEvents = createDragEvents();
 
     if (options && options.hasOwnProperty("date"))
         setDate(options.date);
@@ -111,6 +116,8 @@ function Calendar(options) {
 
         //Включить всплывающие подсказки
         tooltips.enableTooltips();
+        //Разрешает перенос элементов
+        dragEvents.enableDrag();
     }
 
     /**
@@ -296,6 +303,9 @@ function Calendar(options) {
 
         var table = rootElement.querySelector(".calendar__grid");
         table.parentNode.replaceChild(makeMonthGrid(), table);
+
+        //Разрешает перенос элементов
+        dragEvents.enableDrag();
     }
 
     /**
@@ -476,6 +486,10 @@ function Calendar(options) {
         }, timeToEvent);
     }
 
+    /**
+     * Позволяет открывать модальные окна для создания и редактирования событий
+     * @returns {{openNew, openEdit, close}}
+     */
     function createModalWindow() {
         var modal;
 
@@ -743,6 +757,10 @@ function Calendar(options) {
         }
     }
 
+    /**
+     * Позволяет отображать содержимое событий при наведении
+     * @returns {{enableTooltips, disableTooltips}}
+     */
     function createTooltips() {
         var currentTooltip = null; //Подсказка
         var currentTarget = null; //Запомним элемент, для которого выводится подсказка
@@ -837,11 +855,115 @@ function Calendar(options) {
         }
     }
 
+    /**
+     * Позволяет менять дату событий при поможи перетаскивания
+     * @returns {{enableDrag, disableDrag}}
+     */
+    function createDragEvents() {
+
+        var dragElement = null; //Перетаскиваемое событие
+
+        function handleDragStart(event) {
+            this.classList.add("move");
+            dragElement = this;
+
+            tooltips.disableTooltips();
+        }
+
+        function handleDragEnter(event) {
+            this.classList.add("over");
+        }
+
+        function handleDragOver(event) {
+            if (event.preventDefault) {
+                event.preventDefault(); // Позволяет сделать drop
+            }
+
+            event.dataTransfer.dropEffect = 'move';
+
+            return false;
+        }
+
+        function handleDragLeave(event) {
+            //Вышел ли действительно из элемента
+            var target = event.relatedTarget;
+            while (target && target !== this) {
+                target = target.parentNode;
+            }
+
+            if (!target) { //Элемент не принадлежит this
+                this.classList.remove("over");
+            }
+        }
+
+        function handleDragEnd(event) {
+            this.classList.remove("move");
+
+            tooltips.enableTooltips();
+        }
+
+        function handleDrop(event) {
+            if (event.stopPropagation) {
+                event.stopPropagation(); // Не перенаправлять событие
+            }
+
+            //Меняем дату
+            var calendarEvent = CalendarEvent.fromId(dragElement.dataset.eventId);
+            var newDate = new Date(this.firstElementChild.dataset.date).getDate();
+            calendarEvent.date.setDate(newDate);
+
+            //Удаляем событие
+            deleteEvent(calendarEvent.id);
+
+            //Создаем новое и обновляем календарь
+            addNewEvent(calendarEvent);
+            updateCalendar();
+        }
+
+        return {
+            enableDrag: function () {
+                //Разрешить переносить события
+                var canDrag = rootElement.getElementsByClassName("calendar__day_event");
+                var canDrop = rootElement.getElementsByClassName("calendar__day");
+
+                [].forEach.call(canDrag, function (elem) {
+                    elem.setAttribute("draggable", "true");
+                });
+
+                //Обработчики событий
+                //Draggable
+                [].forEach.call(canDrag, function (elem) {
+                    elem.addEventListener("dragstart", handleDragStart);
+                    elem.addEventListener("dragend", handleDragEnd);
+                });
+
+                //Droppable
+                [].forEach.call(canDrop, function (elem) {
+                    //Проверить, не смежный ли месяц
+                    var dayInfo = elem.querySelector(".calendar__day_date");
+                    if (dayInfo.classList.contains("calendar__day_date-adjacent"))
+                        return;
+
+                    elem.addEventListener("dragenter", handleDragEnter);
+                    elem.addEventListener("dragleave", handleDragLeave);
+                    elem.addEventListener("dragover", handleDragOver);
+                    elem.addEventListener("drop", handleDrop);
+                });
+            },
+            disableDrag: function () {
+                //Запретить переносить события
+                var canDrag = rootElement.getElementsByClassName("calendar__day-event");
+                [].forEach.call(canDrag, function (elem) {
+                    elem.setAttribute("draggable", "false");
+                });
+            }
+        }
+    }
+
     //API
     this.getElement = getElement;
     this.nextMonth = nextMonth;
     this.prevMonth = prevMonth;
     this.currentMonth = currentMonth;
-    this.addEvent = addEvent;
     this.notifyEvents = notifyEvents;
 }
