@@ -22,19 +22,10 @@ function CalendarEvent(title, description, date, hasTime, remindOption, id) {
     this.id = id || "event_" + String(Math.random()).substr(2);
 }
 
-/**
- * Возвращает JSON представление объекта класса.
- * @returns {String} JSON строка.
- */
 CalendarEvent.prototype.toString = function () {
     return JSON.stringify(this);
 };
 
-/**
- * Преобразует JSON строку в объект класса.
- * @param s JSON строка.
- * @returns {CalendarEvent}
- */
 CalendarEvent.fromString = function (s) {
     var obj = JSON.parse(s, function (key, value) {
         if (value != null && key == "date")
