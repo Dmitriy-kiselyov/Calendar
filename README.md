@@ -57,3 +57,7 @@ also be deleted.
 To change event date you can drag it into another cell.
 
 ![Imgur](https://i.imgur.com/VGsxPfD.png) 
+
+##Test
+You can test calendar yourself by this
+[link](https://dmitriy-kiselyov.github.io/Calendar/).
