@@ -1,66 +1,59 @@
 # Calendar
-Замысел написания был таков: создать календарь, способный сохранять и добавлять события, а также заблаговременно
-о них оповещать. Дизайн календаря был подсмотрен на таких сайтах как
+
+Calendar widget with day events. Uses browser Notification API, can notify about events beforehand.
+
+Calendar appearance was taken from
 [google calendar](https://calendar.google.com)
-и
+and
 [fullcalendar](https://fullcalendar.io/).
-Однако весь код писался самостоятельно.
+However, code part is independent.
 
-Оговорюсь, моей целью была практика __html и css__, создание __модальных окон__, работа с __датами__,
-__lodash__, __StorageAPI__, __NotificationAPI__ и __Drag'n'Drop__.
-Несмотря на наличие сторонних библиотек, __jQuery игнорировалась__ специально, чтобы отточить навыки в чистом JS.
-Когда я только начинал писать календарь, я не планировал,
-что он станет таким функциональным и большим (1000 строк в одном файле 0_о).
-Прототипы и классы не используются, весь код содержится в одном конструкторе.
-Доступ к переменным осуществляется через замыкание.
-Отдельные компоненты оформлены как _внутренние классы_, чтобы не превращать код в процедурную мешанину.
-Благодаря этому добавлять новые функции в календарь было не так уж и сложно, так что структуру кода я не менял,
-потому что не планировал календарь где-то использовать.
-
-А теперь о самих функциях.
-
-## Строение календаря
-Календарь состоит из шапки и календарной сетки:
+## Structure
+Consists of header and calendar net:
 ![Imgur](https://i.imgur.com/6ayuTUO.png)
-Календарная сетка всегда 6 строк в высоту, дни следующего и предыдущего месяцев обозначаются серым цветом,
-выхоные дни – красным,
-текущий день – оранжевым.
+Calendar net is always 6 rows in height, days of _previous_ and _next month_ are marked with _grey color_,
+_day offs_ are marked _red_, _current day_ is marked _orange_.
 
-## События
+Calendar is adapted only for Russian users, so it uses Russian language and week starts with monday.
+
+## Events
 ![Imgur](https://i.imgur.com/SsN7wLF.png)
-Если в каком-либо дне находятся события, календарь выводит их в соответствующей ячейке в порядке возрастания
-времени событий. Каждое событие состоит из _наименования_, _описания_, _даты_ и _времени_. В ячейке календаря
-выводится компактная информация о каждом событии: _наименование_ и _время_ (если оно есть).
-Чтобы увидеть более детальное описание необходимо навести мышкой на интересующее событие.
+If some day contains events, calendar shows them in corresponding day in time sorted order.
+Every event includes:
+- __title__ (obligatory)
+- __deskription__
+- __date__ (obligatory)
+- __time__
 
+If event does not have __time__ options, it is considered as _whole day event_ and shown in
+date cell first.
+
+To see event whole title and description hover cursor over event. 
 ![Imgur](https://i.imgur.com/ARGwtxA.png)
 
-## Новое событие
-При наведении на ячейку календаря, вверху слева появляется значок __+__. При нажатии на него, открывается
-модальное окошко, позволяющее создавать новое событие.
+## New event
+When hover over calendar cell in up left corner sign "__+__" appears. Clicking it will lead to
+event creation window.
 
 ![Imgur](https://i.imgur.com/lhklF8i.png)
-(обратите внимание, как уголочек подстраивается под расположение ячейки – маленькая гордость :*)
 
-События сохраняются в собственное хранилище браузера (__LocalStorage__), привязки к базе данным нет.
+Events are saved to browser __LocalStorage__, calendar does not use database. Clearing browser cache will
+erase all events.
 
-Для каждого события можно указать, когда браузер о нем предупредит. Для этого необходимо дать соглание на отправку
-уведомлений.
+If you allow browser notifications you can receive memos about upcoming events. 
 
-Для выбора даты и времени используется сторонний плагин.
-
+For choosing date and time widget uses 3d party _jQuery plug-in_.
 ![Imgur](https://i.imgur.com/Y776S2v.png)
 
-## Редактирование событий
+## Edit event
 
-При нажатии на событие, можно его отредактировать или вовсе удалить. Используется предыдущее окошко
-с небольшими изменениями, так что интерфейс знакомый.
+Clicking event leads to editing event window. From this window it can be
+also be deleted.
 
 ![Imgur](https://i.imgur.com/ND0Xmf8.png)
 
-## Перетаскивание событий
+## Event drag'n'drop
 
-Чтобы перенести дату события вовсе не обязательно заходить в него и редактировать.
-Достаточно просто перетащить его мышкой!
+To change event date you can drag it into another cell.
 
 ![Imgur](https://i.imgur.com/VGsxPfD.png) 
